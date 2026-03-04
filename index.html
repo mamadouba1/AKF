@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AKF · Association des Kébémerois de France</title>
 
-  <!-- Fonts (chargées correctement, ne s'affichent pas en texte) -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600DM+Sans:wght@300;400;600&display=swap
+  <!-- Google Fonts (balise complète et fermée) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=DM+Sans:wght@300;400=swap
 
-  <!-- Supabase & EmailJS (chargés correctement) -->
+  <!-- CDNs correctement inclus -->
   https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2</script>
   https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js</script>
 
@@ -86,7 +86,8 @@
       width:100%;border:1.6px solid #e2e8f0;background:#f8fafc;border-radius:10px;padding:12px;font-size:1rem;outline:none;transition:border .15s
     }
     input:focus,select:focus,textarea:focus{border-color:var(--akf-vert);background:#fff}
-    .row{display:flex;gap:10px;flex-wrap:wrap}.two>*{flex:1 1 260px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .two > *{flex:1 1 260px}
 
     /* ===== BUTTONS ===== */
     .btn{
@@ -131,8 +132,8 @@
   <section class="hero">
     <div class="hero-wrap">
       <div class="logo-box">
-        <!-- LOGO en image (plus en texte) -->
-        https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg
+        <!-- LOGO en image -->
+        <img src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_88.jpg
       </div>
       <div class="hero-text">
         <h1 class="hero-title">Association des Kébémerois de France (AKF)</h1>
@@ -146,13 +147,13 @@
 
     <!-- Réseaux (boutons cliquables, pas d’URL en clair) -->
     <div class="tabs">
-      <a class="tab" href="https://www.instagram.com/asso_kebemerois_de_france" target">Instagram</span> <span>Suivre</span>
+      <a class="tab" href="https://www.instagram.com/ance
+        <span class="chip ig">Instagram</span> <span>Suivre</span>
       </a>
-      https://www.tiktok.com/@akf.asso.kbmrois
+      <atps://www.tiktok.com/@akf.asso.kbmrois
         <span class="chip tk">TikTok</span> <span>Suivre</span>
       </a>
-      https://www.facebook.com/profile.php?id=61588628498199
-        <span class="chip fb">Facebook</span> <span>Suivre</span>
+      <a class="tab" href="https://www.facebook.com/profile.php?id=61588628498199" target="_blank" rel="n> <span>Suivre</span>
       </a>
     </div>
   </section>
@@ -170,7 +171,7 @@
       </ul>
     </div>
 
-    <!-- Accordéons : fermés par défaut -->
+    <!-- Accordéons -->
     <div class="accordion">
       <!-- CONTACT -->
       <details>
@@ -281,7 +282,7 @@
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // ===== Supabase
-    const sb = supabase.createClient(
+    const sb = window.supabase.createClient(
       "https://pbhqvmtepipmldfncths.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHF2bXRlcGlwbWxkZm5jdGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0MjU3OTAsImV4cCI6MjA4MjAwMTc5MH0.M-0qndrCgH2r3TQDW4I_THvrEYe_nZx51kGKjiF4egg"
     );
@@ -352,7 +353,7 @@
       document.getElementById('c_message').value = '';
     });
 
-    // ===== Inscription -> supabase + emails
+    // ===== Inscription -> Supabase + emails
     document.getElementById('btnRegister').addEventListener('click', async () => {
       const nom = document.getElementById('i_nom').value.toUpperCase().trim();
       const prenom = document.getElementById('i_prenom').value.trim();
@@ -378,7 +379,10 @@
           statut_id, specialite, quartier, date_inscription
         }]);
 
-      if(error){ alert("Erreur Supabase : " + error.message); return; }
+      if(error){
+        alert("Erreur Supabase : " + error.message + "\n\nSi l’erreur persiste, vérifie les RLS/politiques d’insertion pour la table 'inscrits'.");
+        return;
+      }
 
       // 2) Email à l'association
       try{
