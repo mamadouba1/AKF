@@ -6,9 +6,9 @@
   <title>AKF · Association des Kébémerois de France</title>
 
   <!-- Fonts (chargées correctement, ne s'affichent pas en texte) -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=DM+Sans:wght@300;400=swap
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600DM+Sans:wght@300;400;600&display=swap
 
-  <!-- Supabase & EmailJS -->
+  <!-- Supabase & EmailJS (chargés correctement) -->
   https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2</script>
   https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js</script>
 
@@ -54,7 +54,7 @@
     }
     .hero-sub{color:var(--mut);font-size:clamp(.98rem,1.6vw,1.05rem);margin:0}
 
-    /* ===== SOCIAL TABS (icônes cliquables, pas d'URL en clair) ===== */
+    /* ===== SOCIAL TABS ===== */
     .tabs{max-width:1100px;margin:14px auto 0;display:flex;gap:10px;flex-wrap:wrap;padding:0 16px}
     .tab{
       display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--wh);box-shadow:var(--sh);
@@ -72,9 +72,7 @@
 
     /* ===== ACCORDION ===== */
     .accordion{display:grid;gap:14px}
-    details{
-      background:var(--wh);border-radius:12px;box-shadow:var(--sh);overflow:hidden
-    }
+    details{background:var(--wh);border-radius:12px;box-shadow:var(--sh);overflow:hidden}
     summary{
       list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;
       font-weight:800;color:var(--ink);border-left:6px solid var(--akf-vert)
@@ -112,7 +110,7 @@
 </head>
 <body>
 
-  <!-- Bouton Admin (ouvre une vraie modale) -->
+  <!-- Bouton Admin -->
   <button class="btn alt admin-btn" id="adminBtn" type="button">Admin</button>
 
   <!-- ADMIN MODAL -->
@@ -133,7 +131,7 @@
   <section class="hero">
     <div class="hero-wrap">
       <div class="logo-box">
-        <!-- LOGO en image, pas de lien -->
+        <!-- LOGO en image (plus en texte) -->
         https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg
       </div>
       <div class="hero-text">
@@ -146,12 +144,12 @@
       </div>
     </div>
 
-    <!-- Réseaux sociaux (boutons cliquables, aucune URL en clair) -->
+    <!-- Réseaux (boutons cliquables, pas d’URL en clair) -->
     <div class="tabs">
-      https://www.instagram.com/asso_kebemerois_de_france
-        <span class="chip ig">Instagram</span> <span>Suivre</span>
+      <a class="tab" href="https://www.instagram.com/asso_kebemerois_de_france" target">Instagram</span> <span>Suivre</span>
       </a>
-      <a class="tab" href="https://www.tiktok.com/@akf.asso.kbmros="chip tk">TikTok</span> <span>Suivre</span>
+      https://www.tiktok.com/@akf.asso.kbmrois
+        <span class="chip tk">TikTok</span> <span>Suivre</span>
       </a>
       https://www.facebook.com/profile.php?id=61588628498199
         <span class="chip fb">Facebook</span> <span>Suivre</span>
@@ -303,12 +301,11 @@
 
     adminBtn.addEventListener('click', () => {
       adminOv.classList.add('open');
+      admPwdInp.value = '';
       admPwdInp.focus();
     });
     admClose.addEventListener('click', () => adminOv.classList.remove('open'));
-    adminOv.addEventListener('click', (e) => {
-      if(e.target === adminOv) adminOv.classList.remove('open');
-    });
+    adminOv.addEventListener('click', (e) => { if(e.target === adminOv) adminOv.classList.remove('open'); });
     admEnter.addEventListener('click', checkAdmin);
     admPwdInp.addEventListener('keydown', (e) => {
       if(e.key === 'Enter') checkAdmin();
@@ -383,7 +380,7 @@
 
       if(error){ alert("Erreur Supabase : " + error.message); return; }
 
-      // 2) Email à l'association (on réutilise le template admin)
+      // 2) Email à l'association
       try{
         await emailjs.send(EMAILJS_SERVICE, TEMPLATE_ADMIN, {
           name: `${nom} ${prenom}`,
