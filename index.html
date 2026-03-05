@@ -919,7 +919,7 @@ const _sb = supabase.createClient(
 
 function _mToSB(m){
   const s=m.statut||'Autre';
-  function dateSql(d){if(!d)return null;const p=d.split('/');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:null;}
+  function dateSql(d){if(!d||d===''||d==='—')return null;const p=d.split('/');if(p.length===3&&p[0]&&p[1]&&p[2])return p[2]+'-'+p[1]+'-'+p[0];return null;}
   return{
     nom:m.nom||'', prenom:m.prenom||'',
     sexe_id:m.sexe==='Homme'?1:2,
@@ -936,12 +936,18 @@ const COMMISSION_MAP = {
   'Commissaires aux comptes':4,'Commission Sociale et Educative':5,
   'Relations extérieurs':6,'Organisation':7,'Sages':8
 };
-const STATUT_T_MAP   = {'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4};
-const PRIORITE_MAP   = {'Basse':1,'Moyenne':2,'Haute':3,'haute':3};
+const STATUT_T_MAP = {'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4};
+const PRIORITE_MAP = {'Basse':1,'Moyenne':2,'Haute':3,'haute':3};
 
 function _tToSB(t, forUpdate=false){
-  function dateSql(d){if(!d)return null;const p=d.split('/');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:null;}
-  const payload={
+  // dateSql : retourne null si date vide ou invalide (évite l'erreur Supabase "invalid input syntax for type date")
+  function dateSql(d){
+    if(!d || d==='' || d==='—') return null;
+    const p = d.split('/');
+    if(p.length===3 && p[0] && p[1] && p[2]) return p[2]+'-'+p[1]+'-'+p[0];
+    return null;
+  }
+  const payload = {
     activite:      t.activite||'',
     responsable:   t.responsable||'',
     date_debut:    dateSql(t.date_debut),
@@ -1635,12 +1641,11 @@ async function addTache(){
     statut:g('at-statut').value, relance:'', priorite:g('at-priorite').value,
     commentaires:g('at-commentaires').value.trim(),
   };
-  const sbId=await sbIT(t);
-  if(sbId && sbId!==true) t._id=sbId;
   T.push(t);
+  const ok=await sbIT(t);
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
-  toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
+  toast(ok?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
   ['at-activite','at-responsable','at-date_debut','at-date_fin','at-commentaires'].forEach(id=>{g(id).value='';});
 }
 
@@ -1683,8 +1688,8 @@ function confirmDel(type,idx){
       const ok=await sbDM(nom,prenom);
       toast(ok?'🗑️ Membre supprimé de Supabase.':'🗑️ Supprimé localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     } else {
-      const id=T[idx].id, _id=T[idx]._id; T.splice(idx,1); refreshTaches();
-      const ok=await sbDT(id,_id);
+      const id=T[idx].id; T.splice(idx,1); refreshTaches();
+      const ok=await sbDT(id);
       toast(ok?'🗑️ Tâche supprimée de Supabase.':'🗑️ Supprimée localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     }
     closeOv('del');
