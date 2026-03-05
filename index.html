@@ -930,14 +930,27 @@ function _mToSB(m){
     date_inscription:dateSql(m.date_inscription)||null,
   };
 }
+// Maps label → id pour les colonnes FK de la table taches
+const COMMISSION_MAP = {
+  'Présidence':1,'Secrétariat':2,'Trésorerie':3,
+  'Commissaires aux comptes':4,'Commission Sociale et Educative':5,
+  'Relations extérieurs':6,'Organisation':7,'Sages':8
+};
+const STATUT_T_MAP   = {'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4};
+const PRIORITE_MAP   = {'Basse':1,'Moyenne':2,'Haute':3,'haute':3};
+
 function _tToSB(t, forUpdate=false){
   function dateSql(d){if(!d)return null;const p=d.split('/');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:null;}
   const payload={
-    activite:t.activite||'',
-    commission:t.commission||'', responsable:t.responsable||'',
-    date_debut:dateSql(t.date_debut), date_fin:dateSql(t.date_fin),
-    statut:t.statut||'À faire', relance:t.relance||'',
-    priorite:t.priorite||'Moyenne', commentaires:t.commentaires||'',
+    activite:      t.activite||'',
+    responsable:   t.responsable||'',
+    date_debut:    dateSql(t.date_debut),
+    date_fin:      dateSql(t.date_fin),
+    relance:       t.relance||'',
+    commentaires:  t.commentaires||'',
+    commission_id: COMMISSION_MAP[t.commission] || 2,
+    statut_id:     STATUT_T_MAP[t.statut]       || 1,
+    priorite_id:   PRIORITE_MAP[t.priorite]     || 2,
   };
   if(!forUpdate) payload.id_activite = t.id||'';
   return payload;
@@ -1109,13 +1122,13 @@ function sbRowToTache(r){
     _id:          r.id,
     id:           r.id_activite||'',
     activite:     r.activite||'',
-    commission:   r.commission||'',
+    commission:   {1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux comptes',5:'Commission Sociale et Educative',6:'Relations extérieurs',7:'Organisation',8:'Sages'}[r.commission_id]||'Secrétariat',
     responsable:  r.responsable||'',
     date_debut:   fmtDate(r.date_debut),
     date_fin:     fmtDate(r.date_fin),
-    statut:       r.statut||'À faire',
+    statut:       {1:'À faire',2:'En cours',3:'Terminée',4:'Annulée'}[r.statut_id]||'À faire',
     relance:      r.relance||'',
-    priorite:     r.priorite||'Moyenne',
+    priorite:     {1:'Basse',2:'Moyenne',3:'Haute'}[r.priorite_id]||'Moyenne',
     commentaires: r.commentaires||'',
   };
 }
