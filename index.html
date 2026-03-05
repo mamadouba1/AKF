@@ -151,105 +151,148 @@ nav{padding:0 8px}
 .cr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
 @media(max-width:920px){.cr2,.cr3{grid-template-columns:1fr}}
 
-/* ── RESPONSIVE MOBILE ── */
+/* ══════════════════════════════════════════
+   RESPONSIVE MOBILE (≤768px)
+   Sidebar → Bottom tab bar fixe
+══════════════════════════════════════════ */
 @media(max-width:768px){
-  /* Sidebar devient une barre de navigation en bas */
-  .layout{flex-direction:column}
 
+  /* Layout : on garde flex-row mais le main prend toute la place */
+  .layout{display:block;position:relative;min-height:100vh;}
+
+  /* ── Sidebar → bottom tab bar ── */
   .sb{
-    width:100%;height:auto;
-    position:fixed;bottom:0;left:0;right:0;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    width:100%;
+    height:62px;
     z-index:400;
-    flex-direction:column;
-    border-top:1px solid rgba(255,255,255,.1);
-    box-shadow:0 -4px 20px rgba(0,0,0,.25);
+    flex-direction:row;
+    align-items:stretch;
+    overflow:hidden;
+    border-top:1px solid rgba(255,255,255,.12);
+    box-shadow:0 -2px 16px rgba(0,0,0,.3);
   }
 
-  /* Header sidebar : caché sur mobile, remplacé par topbar */
-  .sl{display:none}
-  .sync-row{display:none}
-  .snl{display:none}
-  .sfoot{display:none}
+  /* Éléments sidebar cachés */
+  .sb .sl,
+  .sb .sync-row,
+  .sb .snl,
+  .sb .sfoot{ display:none !important; }
 
-  /* Nav devient une barre horizontale */
-  nav{
-    display:flex;flex-direction:row;
-    padding:0;overflow-x:auto;
-    scrollbar-width:none;
+  /* Nav = toute la bar */
+  .sb nav{
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    padding:0;
+    height:100%;
   }
-  nav::-webkit-scrollbar{display:none}
 
-  .ni{
-    flex:1;min-width:60px;
+  /* Chaque item = 1/5 */
+  .sb nav .ni{
+    flex:1;
+    display:flex;
     flex-direction:column;
-    align-items:center;justify-content:center;
-    padding:8px 4px 10px;
-    border-radius:0;
-    margin-bottom:0;
+    align-items:center;
+    justify-content:center;
     gap:3px;
-    font-size:.6rem;
-    text-align:center;
-    white-space:nowrap;
+    padding:6px 2px 8px;
+    border-radius:0;
+    margin:0;
+    cursor:pointer;
+    color:rgba(255,255,255,.45);
+    font-size:0; /* cache le texte inline par défaut */
+    border-top:2px solid transparent;
   }
-  .ni-ic{font-size:18px;width:auto}
-  .ni-b{
-    display:none; /* badges cachés sur mobile */
-  }
-  .ni.on{
-    background:rgba(255,255,255,.12);
+  .sb nav .ni:hover{ background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); }
+  .sb nav .ni.on{
+    color:#fff;
+    background:rgba(255,255,255,.1);
     border-top:2px solid var(--gr2);
   }
 
-  /* Main avec padding-bottom pour la nav bar */
-  .main{
-    padding:14px 12px 80px;
-    width:100%;
+  /* Icône grande */
+  .sb nav .ni .ni-ic{
+    font-size:20px;
+    width:auto;
+    display:block;
   }
 
-  /* Topbar adapté mobile */
-  .topbar{flex-direction:column;gap:8px;margin-bottom:12px}
-  .ta{margin-left:0;width:100%;justify-content:flex-start;flex-wrap:wrap}
-  .tt h1{font-size:1.1rem}
-  .tt p{font-size:.72rem}
+  /* Texte label sous l'icône */
+  .sb nav .ni .ni-txt{
+    display:block;
+    font-size:.58rem;
+    font-weight:600;
+    line-height:1;
+    flex:none;
+  }
 
-  /* KPIs 2 colonnes */
-  .kpis{grid-template-columns:1fr 1fr;gap:8px}
-  .kpi{padding:10px 12px}
-  .kv{font-size:1.5rem}
+  /* Badges cachés sur mobile */
+  .sb nav .ni .ni-b{ display:none; }
 
-  /* Charts 1 colonne */
-  .cr2,.cr3{grid-template-columns:1fr}
+  /* ── Main content ── */
+  .main{
+    display:block;
+    width:100%;
+    padding:14px 12px 78px;
+    min-height:100vh;
+    box-sizing:border-box;
+  }
 
-  /* Tables scrollables */
-  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:600px}
+  /* Tabs visibles */
+  .tc{ display:none !important; }
+  .tc.on{ display:block !important; animation:fu .2s both; }
 
-  /* Toolbar filtres sur mobile */
-  .toolbar{flex-wrap:wrap;gap:6px;padding:8px 10px}
-  .sw input{width:100%}
-  .flt{font-size:.72rem}
+  /* ── Topbar ── */
+  .topbar{ flex-direction:column; gap:8px; margin-bottom:14px; }
+  .ta{ margin-left:0; width:100%; flex-wrap:wrap; gap:6px; }
+  .tt h1{ font-size:1.05rem; }
+  .tt p{ font-size:.72rem; }
+  .btn{ font-size:.74rem; padding:6px 11px; }
 
-  /* Map hauteur réduite */
-  #map{height:240px}
+  /* ── KPIs 2 colonnes ── */
+  .kpis{ grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+  .kpi{ padding:10px 12px; }
+  .kv{ font-size:1.5rem; }
+  .kl{ font-size:.68rem; }
 
-  /* Modals plein écran sur mobile */
+  /* ── Charts 1 colonne ── */
+  .cr2,.cr3{ grid-template-columns:1fr; gap:10px; }
+
+  /* ── Tables ── */
+  .tcard{ border-radius:10px; }
+  .toolbar{ flex-wrap:wrap; gap:6px; padding:8px 10px; }
+  .sw input{ width:150px; }
+  .rc{ font-size:.68rem; }
+  .tw{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table{ min-width:580px; font-size:.75rem; }
+  thead th{ padding:7px 8px; }
+  tbody td{ padding:7px 8px; }
+
+  /* ── Carte ── */
+  #map{ height:260px; }
+  .mfbar{ flex-wrap:wrap; gap:6px; }
+
+  /* ── Modals ── */
   .mbox,.dbox{
-    width:96vw;max-height:90vh;
-    border-radius:12px;
+    width:96vw;
+    max-height:88vh;
+    border-radius:14px;
     padding:16px;
   }
-  .fg{grid-template-columns:1fr}
-  .fr.full{grid-column:auto}
+  .fg{ grid-template-columns:1fr; gap:8px; }
+  .fr.full{ grid-column:auto; }
 
-  /* CR wrapper */
-  #cr-content{padding:16px !important}
+  /* ── CR ── */
+  #cr-content{ padding:14px 16px !important; }
 
-  /* Toast en bas */
-  .tw-wrap{bottom:90px;right:10px;left:10px}
-  .toast{text-align:center}
+  /* ── Toast ── */
+  .tw-wrap{ bottom:72px; right:10px; left:10px; }
+  .toast{ text-align:center; font-size:.76rem; }
 
-  /* Bouton déconnexion fixe caché (géré dans topbar) */
-  body > button[onclick="logout()"]{display:none}
+  /* ── Déconnexion fixe (redondant avec topbar) ── */
+  body > button[style*="position:fixed"][onclick*="logout"]{ display:none !important; }
 }
 .card{background:var(--wh);border-radius:var(--R);box-shadow:var(--sh);padding:16px}
 .ct{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -1438,6 +1481,10 @@ function goTab(id, el){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   g('tab-'+id).classList.add('on'); el.classList.add('on');
   if(id==='carte') setTimeout(()=>mapI&&mapI.invalidateSize(),220);
+  // Sur mobile : remonter en haut du contenu
+  const main = document.querySelector('.main');
+  if(main) main.scrollTop = 0;
+  window.scrollTo(0,0);
 }
 
 // ═══════════════════════════════════════════════════════════════════
