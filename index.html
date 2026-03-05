@@ -930,21 +930,33 @@ function _mToSB(m){
     date_inscription:dateSql(m.date_inscription)||null,
   };
 }
-function _tToSB(t){
+function _tToSB(t, forUpdate=false){
   function dateSql(d){if(!d)return null;const p=d.split('/');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:null;}
-  return{
-    id_activite:t.id||'', activite:t.activite||'',
+  const payload={
+    activite:t.activite||'',
     commission:t.commission||'', responsable:t.responsable||'',
     date_debut:dateSql(t.date_debut), date_fin:dateSql(t.date_fin),
     statut:t.statut||'À faire', relance:t.relance||'',
     priorite:t.priorite||'Moyenne', commentaires:t.commentaires||'',
   };
+  if(!forUpdate) payload.id_activite = t.id||'';
+  return payload;
 }
 async function sbIM(m){const{error}=await _sb.from('inscrits').insert([_mToSB(m)]);if(error)console.warn('SB insert membre:',error.message);return!error;}
 async function sbUM(m){const{error}=await _sb.from('inscrits').update(_mToSB(m)).eq('nom',m.nom).eq('prenom',m.prenom);if(error)console.warn('SB update membre:',error.message);return!error;}
 async function sbDM(nom,prenom){const{error}=await _sb.from('inscrits').delete().eq('nom',nom).eq('prenom',prenom);if(error)console.warn('SB delete membre:',error.message);return!error;}
-async function sbIT(t){const{data,error}=await _sb.from('taches').insert([_tToSB(t)]).select('id').single();if(error){console.warn('SB insert tâche:',error.message);return null;}return data?.id||true;}
-async function sbUT(t){const{error}=await _sb.from('taches').update(_tToSB(t)).eq(t._id?'id':'id_activite',t._id||t.id);if(error)console.warn('SB update tâche:',error.message);return!error;}
+async function sbIT(t){const{data,error}=await _sb.from('taches').insert([_tToSB(t,false)]).select('id').single();if(error){console.warn('SB insert tâche:',error.message);return null;}return data?.id||true;}
+async function sbUT(t){
+  const payload=_tToSB(t,true);
+  let error;
+  if(t._id){
+    ({error}=await _sb.from('taches').update(payload).eq('id',t._id));
+  } else {
+    ({error}=await _sb.from('taches').update(payload).eq('id_activite',t.id||''));
+  }
+  if(error) console.warn('SB update tâche:',error.message);
+  return !error;
+}
 async function sbDT(id,_id){const{error}=await _sb.from('taches').delete().eq(_id?'id':'id_activite',_id||id);if(error)console.warn('SB delete tâche:',error.message);return!error;}
 
 // ─── CRUD CR ─────────────────────────────────────────────────────
@@ -1610,9 +1622,9 @@ async function addTache(){
     statut:g('at-statut').value, relance:'', priorite:g('at-priorite').value,
     commentaires:g('at-commentaires').value.trim(),
   };
-  T.push(t);
   const sbId=await sbIT(t);
-  if(sbId && sbId!==true) t._id=sbId; // stocker l'id Supabase pour les futurs update/delete
+  if(sbId && sbId!==true) t._id=sbId;
+  T.push(t);
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
   toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
