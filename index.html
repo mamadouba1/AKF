@@ -755,6 +755,18 @@ if('serviceWorker' in navigator){
           <div id="at-notif-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:100"></div>
         </div>
         <div id="at-notif-selected" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+        <div id="at-notif-btns" style="display:none;gap:7px;margin-top:8px;flex-wrap:wrap">
+          <button onclick="ouvrirMailNotif('at','gmail')"
+            style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:none;
+                   background:#fef2f2;color:#dc2626;cursor:pointer;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif">
+            <img src="https://www.google.com/favicon.ico" width="14"> Gmail
+          </button>
+          <button onclick="ouvrirMailNotif('at','outlook')"
+            style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:none;
+                   background:#eff6ff;color:#1d4ed8;cursor:pointer;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif">
+            <img src="https://res.cdn.office.net/assets/mail/pwa/v2/images/favicon.ico" width="14"> Outlook
+          </button>
+        </div>
       </div>
     </div>
     <div class="fa">
@@ -793,6 +805,18 @@ if('serviceWorker' in navigator){
           <div id="et-notif-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:100"></div>
         </div>
         <div id="et-notif-selected" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+        <div id="et-notif-btns" style="display:none;gap:7px;margin-top:8px;flex-wrap:wrap">
+          <button onclick="ouvrirMailNotif('et','gmail')"
+            style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:none;
+                   background:#fef2f2;color:#dc2626;cursor:pointer;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif">
+            <img src="https://www.google.com/favicon.ico" width="14"> Gmail
+          </button>
+          <button onclick="ouvrirMailNotif('et','outlook')"
+            style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:none;
+                   background:#eff6ff;color:#1d4ed8;cursor:pointer;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif">
+            <img src="https://res.cdn.office.net/assets/mail/pwa/v2/images/favicon.ico" width="14"> Outlook
+          </button>
+        </div>
       </div>
     </div>
     <div class="fa">
@@ -1755,6 +1779,7 @@ function removeNotifMembre(prefix, email){
 
 function renderNotifSelected(prefix){
   const wrap = g(prefix+'-notif-selected');
+  const btns = g(prefix+'-notif-btns');
   wrap.innerHTML = notifSelected[prefix].map(m=>`
     <span style="display:inline-flex;align-items:center;gap:5px;background:#e8f5ee;
                  color:#0e7a45;border-radius:20px;padding:3px 10px 3px 7px;font-size:.75rem;font-weight:600">
@@ -1762,35 +1787,54 @@ function renderNotifSelected(prefix){
       <span onclick="removeNotifMembre('${prefix}','${m.email}')"
         style="cursor:pointer;font-size:.9rem;line-height:1;opacity:.7">✕</span>
     </span>`).join('');
+  // Afficher les boutons Gmail/Outlook seulement si des membres sont sélectionnés
+  if(btns) btns.style.display = notifSelected[prefix].length ? 'flex' : 'none';
+}
+
+// Tache courante pour les boutons mail dans les modals
+let _currentTacheForNotif = {at:null, et:null};
+
+function ouvrirMailNotif(prefix, client){
+  const tache = _currentTacheForNotif[prefix];
+  if(!tache || !notifSelected[prefix].length) return;
+  const urls = buildMailUrls(prefix, tache);
+  if(!urls) return;
+  window.open(client==='gmail' ? urls.gmail : urls.outlook, '_blank');
+}
+
+function buildMailUrls(prefix, tache){
+  const destinataires = notifSelected[prefix];
+  if(!destinataires.length) return null;
+  const emails = destinataires.map(x=>x.email).join(',');
+  const sujet  = 'Tâche à faire : ' + tache.activite;
+  const dd = tache.date_debut ? fmtD(tache.date_debut) : '—';
+  const df = tache.date_fin   ? fmtD(tache.date_fin)   : '—';
+  const corps =
+    'Bonjour,\n\n' +
+    'Vous êtes attribué(e) pour réaliser la tâche suivante :\n\n' +
+    'Tâche : ' + tache.activite + '\n' +
+    'Date de début : ' + dd + '\n' +
+    'Date de fin : ' + df + '\n\n' +
+    'Cordialement,\nAssociation des Kébémerois de France — AKF';
+  return {
+    gmail:   `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(emails)}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`,
+    outlook: `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(emails)}&subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`,
+    noms:    destinataires.map(x=>x.prenom+' '+x.nom).join(', ')
+  };
 }
 
 function envoyerNotifTache(prefix, tache){
-  const destinataires = notifSelected[prefix];
-  if(!destinataires.length) return;
-  const emails = destinataires.map(x=>x.email).join(',');
-  const sujet = encodeURIComponent('Tâche à faire : ' + tache.activite);
-  const dd = tache.date_debut ? fmtD(tache.date_debut) : '—';
-  const df = tache.date_fin   ? fmtD(tache.date_fin)   : '—';
-  const corps = encodeURIComponent(
-    'Bonjour,\n\n' +
-    'Vous êtes attribué(e) pour réaliser la tâche suivante :\n\n' +
-    '📋 Tâche : ' + tache.activite + '\n' +
-    '📅 Date de début : ' + dd + '\n' +
-    '📅 Date de fin : ' + df + '\n\n' +
-    'Cordialement,\n' +
-    'Association des Kébémerois de France — AKF'
-  );
-  // Créer un lien <a> temporaire et simuler un clic — fonctionne sur tous les navigateurs
-  const a = document.createElement('a');
-  a.href = `mailto:${emails}?subject=${sujet}&body=${corps}`;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>document.body.removeChild(a), 200);
-  // Reset sélection
+  const urls = buildMailUrls(prefix, tache);
+  if(!urls) return;
+  // Ouvrir Gmail directement dans un nouvel onglet
+  window.open(urls.gmail, '_blank');
   notifSelected[prefix] = [];
   renderNotifSelected(prefix);
+}
+
+function closeMailPopup(){
+  const p=g('mail-popup'); if(p) p.remove();
+  const o=g('mail-overlay'); if(o) o.remove();
 }
 
 // Fermer dropdown si clic ailleurs
@@ -1823,6 +1867,7 @@ async function addTache(){
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
   toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
+  _currentTacheForNotif['at'] = t;
   if(notifSelected['at']?.length) envoyerNotifTache('at', t);
   ['at-activite','at-responsable','at-date_debut','at-date_fin','at-relance','at-commentaires'].forEach(id=>{g(id).value='';});
 }
@@ -1838,6 +1883,7 @@ function editTache(idx){
   g('et-priorite').value=t.priorite||'Moyenne';
   g('et-relance').value=t.relance||'';
   g('et-commentaires').value=t.commentaires||'';
+  _currentTacheForNotif['et'] = t;
   openOv('et');
 }
 g('et-ok').addEventListener('click',async()=>{
@@ -1855,6 +1901,7 @@ g('et-ok').addEventListener('click',async()=>{
   updateKT(); drawChT(); renderTT(); // pas de reset page
   const ok=await sbUT(T[etiIdx]);
   toast(ok?'✅ Tâche mise à jour dans Supabase !':'⚠️ Mis à jour (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
+  _currentTacheForNotif['et'] = T[etiIdx];
   if(notifSelected['et']?.length) envoyerNotifTache('et', T[etiIdx]);
 });
 
