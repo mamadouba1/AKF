@@ -971,7 +971,7 @@ async function sbUM(m, prevVerif){
       await emailjs.send(EMAILJS_SERVICE, TEMPLATE_USER, {
         name:m.prenom||m.nom,
         to_email:m.email,
-        message:'Bonne nouvelle ! Votre inscription à l'Association des Kébémerois de France (AKF) a été validée par l'administration. Bienvenue officiellement parmi nous ! 🎉'
+        message:"Bonne nouvelle ! Votre inscription à l'Association des Kébémerois de France (AKF) a été validée par l'administration. Bienvenue officiellement parmi nous ! 🎉"
       });
     }catch(e){console.warn('EmailJS vérif:',e);}
   }
