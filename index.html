@@ -943,9 +943,9 @@ function _tToSB(t){
 async function sbIM(m){const{error}=await _sb.from('inscrits').insert([_mToSB(m)]);if(error)console.warn('SB insert membre:',error.message);return!error;}
 async function sbUM(m){const{error}=await _sb.from('inscrits').update(_mToSB(m)).eq('nom',m.nom).eq('prenom',m.prenom);if(error)console.warn('SB update membre:',error.message);return!error;}
 async function sbDM(nom,prenom){const{error}=await _sb.from('inscrits').delete().eq('nom',nom).eq('prenom',prenom);if(error)console.warn('SB delete membre:',error.message);return!error;}
-async function sbIT(t){const{error}=await _sb.from('taches').insert([_tToSB(t)]);if(error)console.warn('SB insert tâche:',error.message);return!error;}
-async function sbUT(t){const{error}=await _sb.from('taches').update(_tToSB(t)).eq('id_activite',t.id);if(error)console.warn('SB update tâche:',error.message);return!error;}
-async function sbDT(id){const{error}=await _sb.from('taches').delete().eq('id_activite',id);if(error)console.warn('SB delete tâche:',error.message);return!error;}
+async function sbIT(t){const{data,error}=await _sb.from('taches').insert([_tToSB(t)]).select('id').single();if(error){console.warn('SB insert tâche:',error.message);return null;}return data?.id||true;}
+async function sbUT(t){const{error}=await _sb.from('taches').update(_tToSB(t)).eq(t._id?'id':'id_activite',t._id||t.id);if(error)console.warn('SB update tâche:',error.message);return!error;}
+async function sbDT(id,_id){const{error}=await _sb.from('taches').delete().eq(_id?'id':'id_activite',_id||id);if(error)console.warn('SB delete tâche:',error.message);return!error;}
 
 // ─── CRUD CR ─────────────────────────────────────────────────────
 function printCR(){
@@ -1611,10 +1611,11 @@ async function addTache(){
     commentaires:g('at-commentaires').value.trim(),
   };
   T.push(t);
-  const ok=await sbIT(t);
+  const sbId=await sbIT(t);
+  if(sbId && sbId!==true) t._id=sbId; // stocker l'id Supabase pour les futurs update/delete
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
-  toast(ok?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
+  toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
   ['at-activite','at-responsable','at-date_debut','at-date_fin','at-commentaires'].forEach(id=>{g(id).value='';});
 }
 
@@ -1657,8 +1658,8 @@ function confirmDel(type,idx){
       const ok=await sbDM(nom,prenom);
       toast(ok?'🗑️ Membre supprimé de Supabase.':'🗑️ Supprimé localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     } else {
-      const id=T[idx].id; T.splice(idx,1); refreshTaches();
-      const ok=await sbDT(id);
+      const id=T[idx].id, _id=T[idx]._id; T.splice(idx,1); refreshTaches();
+      const ok=await sbDT(id,_id);
       toast(ok?'🗑️ Tâche supprimée de Supabase.':'🗑️ Supprimée localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     }
     closeOv('del');
