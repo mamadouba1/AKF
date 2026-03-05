@@ -676,18 +676,18 @@ if('serviceWorker' in navigator){
   <div class="mbox">
     <div class="mtit">➕ Ajouter un membre <button class="mc" onclick="closeOv('am')">✕</button></div>
     <div class="fg">
-      <div class="fr"><label>Nom *</label><input id="am-nom" placeholder="NOM"></div>
-      <div class="fr"><label>Prénom *</label><input id="am-prenom" placeholder="Prénom"></div>
+      <div class="fr"><label>Nom *</label><input id="am-nom" placeholder="BA"></div>
+      <div class="fr"><label>Prénom *</label><input id="am-prenom" placeholder="Mamadou"></div>
       <div class="fr"><label>Sexe</label><select id="am-sexe"><option>Homme</option><option>Femme</option></select></div>
-      <div class="fr"><label>Ville *</label><input id="am-ville" placeholder="Paris"></div>
-      <div class="fr"><label>Téléphone</label><input id="am-telephone" placeholder="06…"></div>
-      <div class="fr"><label>Email</label><input id="am-email" type="email"></div>
-      <div class="fr"><label>Année d'arrivée</label><input id="am-annee_arrivee" type="number" min="1990" max="2030" placeholder="2022"></div>
-      <div class="fr"><label>Statut</label><select id="am-statut"><option>Professionnel</option><option>Étudiant</option><option>Autre</option></select></div>
-      <div class="fr full"><label>Spécialité / Fonction</label><input id="am-specialite" placeholder="Ingénieur, Comptable…"></div>
+      <div class="fr"><label>Ville</label><input id="am-ville" placeholder="Compiègne"></div>
+      <div class="fr"><label>Téléphone</label><input id="am-telephone" placeholder="07…"></div>
+      <div class="fr"><label>Email</label><input id="am-email" type="email" placeholder="exemple@email.com"></div>
+      <div class="fr"><label>Année d'arrivée</label><input id="am-annee_arrivee" type="number" min="1990" max="2035" placeholder="2023"></div>
+      <div class="fr"><label>Statut</label><select id="am-statut"><option>Professionnel</option><option>Étudiant</option><option>Autres</option></select></div>
+      <div class="fr"><label>Spécialité</label><input id="am-specialite" placeholder="Informatique…"></div>
       <div class="fr"><label>Quartier d'origine</label><input id="am-quartier" placeholder="Escale, Médina…"></div>
-      <div class="fr"><label>Participation bureau</label><select id="am-direction"><option value="Oui">Oui</option><option value="Non" selected>Non</option></select></div>
-      <div class="fr"><label>Vérification</label><select id="am-verification"><option>Vérifié</option><option>Non vérifié</option></select></div>
+      <div class="fr"><label>Date d'inscription</label><input id="am-date_inscription" type="date"></div>
+      <div class="fr"><label>Participation bureau</label><select id="am-direction"><option value="Non" selected>Non</option><option value="Oui">Oui</option></select></div>
     </div>
     <div class="fa">
       <button class="btn bgh" onclick="closeOv('am')">Annuler</button>
@@ -707,12 +707,13 @@ if('serviceWorker' in navigator){
       <div class="fr"><label>Ville</label><input id="em-ville"></div>
       <div class="fr"><label>Téléphone</label><input id="em-telephone"></div>
       <div class="fr"><label>Email</label><input id="em-email" type="email"></div>
-      <div class="fr"><label>Année d'arrivée</label><input id="em-annee_arrivee" type="number" min="1990" max="2030"></div>
-      <div class="fr"><label>Statut</label><select id="em-statut"><option>Professionnel</option><option>Étudiant</option><option>Autre</option></select></div>
-      <div class="fr full"><label>Spécialité / Fonction</label><input id="em-specialite"></div>
+      <div class="fr"><label>Année d'arrivée</label><input id="em-annee_arrivee" type="number" min="1990" max="2035"></div>
+      <div class="fr"><label>Statut</label><select id="em-statut"><option>Professionnel</option><option>Étudiant</option><option>Autres</option></select></div>
+      <div class="fr full"><label>Spécialité</label><input id="em-specialite"></div>
       <div class="fr"><label>Quartier d'origine</label><input id="em-quartier"></div>
-      <div class="fr"><label>Participation bureau</label><select id="em-direction"><option value="Oui">Oui</option><option value="Non">Non</option></select></div>
-      <div class="fr"><label>Vérification</label><select id="em-verification"><option>Vérifié</option><option>Non vérifié</option></select></div>
+      <div class="fr"><label>Date d'inscription</label><input id="em-date_inscription" type="date"></div>
+      <div class="fr"><label>Participation bureau</label><select id="em-direction"><option value="Non">Non</option><option value="Oui">Oui</option></select></div>
+      <div class="fr"><label>Vérification</label><select id="em-verification"><option value="Non vérifié">Non vérifié</option><option value="Vérifié">Vérifié ✅</option></select></div>
     </div>
     <div class="fa">
       <button class="btn bgh" onclick="closeOv('em')">Annuler</button>
@@ -930,21 +931,24 @@ function _mToSB(m){
     date_inscription:dateSql(m.date_inscription)||null,
   };
 }
-// Maps label → id FK table taches
+// ── Maps FK taches ──────────────────────────────────────────────
 const COMMISSION_MAP={'Présidence':1,'Secrétariat':2,'Trésorerie':3,'Commissaires aux comptes':4,'Commission Sociale et Educative':5,'Relations extérieurs':6,'Organisation':7,'Sages':8};
-const STATUT_T_MAP={'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4};
+const STATUT_T_MAP={'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4,'Abandonner':4};
 const PRIORITE_MAP={'Basse':1,'Moyenne':2,'Haute':3,'haute':3};
+const COMMISSION_ID={1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux comptes',5:'Commission Sociale et Educative',6:'Relations extérieurs',7:'Organisation',8:'Sages'};
+const STATUT_T_ID={1:'À faire',2:'En cours',3:'Terminée',4:'Annulée'};
+const PRIORITE_ID={1:'Basse',2:'Moyenne',3:'Haute'};
 
+function dateSqlT(d){
+  if(!d||d===''||d==='—')return null;
+  const p=d.split('/');
+  if(p.length===3&&p[0]&&p[1]&&p[2])return p[2]+'-'+p[1]+'-'+p[0];
+  return null;
+}
 function _tToSB(t, forUpdate=false){
-  function dateSql(d){
-    if(!d||d===''||d==='—')return null;
-    const p=d.split('/');
-    if(p.length===3&&p[0]&&p[1]&&p[2])return p[2]+'-'+p[1]+'-'+p[0];
-    return null;
-  }
   const payload={
     activite:t.activite||'', responsable:t.responsable||'',
-    date_debut:dateSql(t.date_debut), date_fin:dateSql(t.date_fin),
+    date_debut:dateSqlT(t.date_debut), date_fin:dateSqlT(t.date_fin),
     relance:t.relance||'', commentaires:t.commentaires||'',
     commission_id:COMMISSION_MAP[t.commission]||2,
     statut_id:STATUT_T_MAP[t.statut]||1,
@@ -953,18 +957,41 @@ function _tToSB(t, forUpdate=false){
   if(!forUpdate) payload.id_activite=t.id||'';
   return payload;
 }
-async function sbIM(m){const{error}=await _sb.from('inscrits').insert([_mToSB(m)]);if(error)console.warn('SB insert membre:',error.message);return!error;}
-async function sbUM(m){
-  // Utiliser _id (bigint) si dispo, sinon fallback nom+prenom
+async function sbIM(m){
+  const{data,error}=await _sb.from('inscrits').insert([_mToSB(m)]).select('id').single();
+  if(error){console.warn('SB insert membre:',error.message);return null;}
+  return data?.id||true;
+}
+async function sbUM(m, prevVerif){
   const payload=_mToSB(m);
   const{error}=m._id
-    ? await _sb.from('inscrits').update(payload).eq('id',m._id)
-    : await _sb.from('inscrits').update(payload).eq('nom',m.nom).eq('prenom',m.prenom);
-  if(error)console.warn('SB update membre:',error.message);
+    ?await _sb.from('inscrits').update(payload).eq('id',m._id)
+    :await _sb.from('inscrits').update(payload).eq('nom',m.nom).eq('prenom',m.prenom);
+  if(error){console.warn('SB update membre:',error.message);return false;}
+  // Envoyer mail si vérification vient de passer à Vérifié
+  if(prevVerif!=='Vérifié'&&m.verification==='Vérifié'&&m.email){
+    try{
+      await emailjs.send(EMAILJS_SERVICE, TEMPLATE_USER, {
+        name:m.prenom||m.nom,
+        to_email:m.email,
+        message:'Bonne nouvelle ! Votre inscription à l'Association des Kébémerois de France (AKF) a été validée par l'administration. Bienvenue officiellement parmi nous ! 🎉'
+      });
+    }catch(e){console.warn('EmailJS vérif:',e);}
+  }
+  return true;
+}
+async function sbDM(id,nom,prenom){
+  const{error}=id
+    ?await _sb.from('inscrits').delete().eq('id',id)
+    :await _sb.from('inscrits').delete().eq('nom',nom).eq('prenom',prenom);
+  if(error)console.warn('SB delete membre:',error.message);
   return!error;
 }
-async function sbDM(nom,prenom,_id){const{error}=await _sb.from('inscrits').delete().eq(_id?'id':'nom',_id||nom);if(error)console.warn('SB delete membre:',error.message);return!error;}
-async function sbIT(t){const{data,error}=await _sb.from('taches').insert([_tToSB(t,false)]).select('id').single();if(error){console.warn('SB insert tâche:',error.message);return null;}return data?.id||true;}
+async function sbIT(t){
+  const{data,error}=await _sb.from('taches').insert([_tToSB(t,false)]).select('id').single();
+  if(error){console.warn('SB insert tâche:',error.message);return null;}
+  return data?.id||true;
+}
 async function sbUT(t){
   const payload=_tToSB(t,true);
   let error;
@@ -973,7 +1000,11 @@ async function sbUT(t){
   if(error)console.warn('SB update tâche:',error.message);
   return!error;
 }
-async function sbDT(id,_id){const{error}=await _sb.from('taches').delete().eq(_id?'id':'id_activite',_id||id);if(error)console.warn('SB delete tâche:',error.message);return!error;}
+async function sbDT(id,_id){
+  const{error}=await _sb.from('taches').delete().eq(_id?'id':'id_activite',_id||id);
+  if(error)console.warn('SB delete tâche:',error.message);
+  return!error;
+}
 
 // ─── CRUD CR ─────────────────────────────────────────────────────
 function printCR(){
@@ -1591,20 +1622,24 @@ async function addMembre(){
   if(!nom||!prenom){toast('⚠️ Nom et Prénom requis','#c0392b');return;}
   const btn=document.querySelector('#ov-am .btn.bg');
   if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement…';}
+  // date_inscription : depuis champ date ou aujourd'hui
+  const diRaw=g('am-date_inscription')?.value;
+  const diVal=diRaw?toFR(diRaw):nowFR();
   const m={nom,prenom,
     sexe:g('am-sexe').value, ville:g('am-ville').value.trim(),
     telephone:g('am-telephone').value.trim(), email:g('am-email').value.trim(),
     annee_arrivee:g('am-annee_arrivee').value, statut:g('am-statut').value,
     specialite:g('am-specialite').value.trim(), quartier:g('am-quartier').value.trim(),
-    direction:g('am-direction').value, verification:g('am-verification').value,
-    date_inscription:nowFR(),
+    direction:g('am-direction')?.value||'Non', verification:'Non vérifié',
+    date_inscription:diVal,
   };
+  const sbId=await sbIM(m);
+  if(sbId&&sbId!==true) m._id=sbId;
   M.push(m);
-  const ok=await sbIM(m);
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('am'); refreshAll();
-  toast(ok?'✅ '+nom+' ajouté(e) dans Supabase !':'⚠️ '+nom+' ajouté (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
-  ['am-nom','am-prenom','am-ville','am-telephone','am-email','am-annee_arrivee','am-specialite','am-quartier'].forEach(id=>{g(id).value='';});
+  toast(sbId?'✅ '+nom+' ajouté(e) dans Supabase !':'⚠️ '+nom+' ajouté (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
+  ['am-nom','am-prenom','am-ville','am-telephone','am-email','am-annee_arrivee','am-specialite','am-quartier','am-date_inscription'].forEach(id=>{if(g(id))g(id).value='';});
 }
 
 function editMembre(idx){
@@ -1612,18 +1647,29 @@ function editMembre(idx){
   ['nom','prenom','sexe','ville','telephone','email','annee_arrivee','statut','specialite','quartier','direction','verification'].forEach(k=>{
     const el=g('em-'+k); if(el) el.value=r[k]||'';
   });
+  // date_inscription : convertir JJ/MM/AAAA → AAAA-MM-JJ pour input[type=date]
+  const di=g('em-date_inscription');
+  if(di) di.value=toISO(r.date_inscription||'');
   openOv('em');
 }
 g('em-ok').addEventListener('click',async()=>{
   if(emiIdx<0) return;
+  const prevVerif=M[emiIdx].verification;
   ['nom','prenom','sexe','ville','telephone','email','annee_arrivee','statut','specialite','quartier','direction','verification'].forEach(k=>{
     const el=g('em-'+k); if(el) M[emiIdx][k]=el.value.trim();
   });
+  // date_inscription
+  const di=g('em-date_inscription');
+  if(di&&di.value) M[emiIdx].date_inscription=toFR(di.value);
   closeOv('em');
-  // Rafraîchir SANS reset de page (p1/p2 conservés)
+  // Refresh SANS reset pagination
   applyFM(); applyFM2(); updateKM(); drawChM();
-  const ok=await sbUM(M[emiIdx]);
-  toast(ok?'✅ Membre mis à jour dans Supabase !':'⚠️ Mis à jour (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
+  const ok=await sbUM(M[emiIdx], prevVerif);
+  if(ok&&prevVerif!=='Vérifié'&&M[emiIdx].verification==='Vérifié'){
+    toast('✅ Membre vérifié — email de confirmation envoyé !','#0e7a45');
+  } else {
+    toast(ok?'✅ Membre mis à jour dans Supabase !':'⚠️ Mis à jour (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1641,7 +1687,7 @@ async function addTache(){
     commentaires:g('at-commentaires').value.trim(),
   };
   const sbId=await sbIT(t);
-  if(sbId && sbId!==true) t._id=sbId;
+  if(sbId&&sbId!==true) t._id=sbId;
   T.push(t);
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
@@ -1672,8 +1718,7 @@ g('et-ok').addEventListener('click',async()=>{
   T[etiIdx].priorite    = g('et-priorite').value;
   T[etiIdx].commentaires= g('et-commentaires').value.trim();
   closeOv('et');
-  // Rafraîchir SANS reset de page (pt conservé)
-  updateKT(); drawChT(); renderTT();
+  updateKT(); drawChT(); renderTT(); // pas de reset page
   const ok=await sbUT(T[etiIdx]);
   toast(ok?'✅ Tâche mise à jour dans Supabase !':'⚠️ Mis à jour (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
 });
@@ -1686,12 +1731,12 @@ function confirmDel(type,idx){
   g('del-msg').textContent = `Supprimer "${name}" ? Cette action est irréversible.`;
   delFn = async()=>{
     if(type==='membre'){
-      const{nom,prenom,_id}=M[idx]; M.splice(idx,1); refreshAll();
-      const ok=await sbDM(nom,prenom,_id);
+      const{_id,nom,prenom}=M[idx]; M.splice(idx,1); refreshAll();
+      const ok=await sbDM(_id,nom,prenom);
       toast(ok?'🗑️ Membre supprimé de Supabase.':'🗑️ Supprimé localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     } else {
-      const id=T[idx].id; T.splice(idx,1); refreshTaches();
-      const ok=await sbDT(id);
+      const{id,_id}=T[idx]; T.splice(idx,1); refreshTaches();
+      const ok=await sbDT(id,_id);
       toast(ok?'🗑️ Tâche supprimée de Supabase.':'🗑️ Supprimée localement (Supabase KO)',ok?'#0e7a45':'#b07d0a');
     }
     closeOv('del');
@@ -1719,13 +1764,15 @@ function expCSV(type){
   let data, cols, heads, fn;
   if(type==='membres'||type==='liste'){
     data=fM.length?fM:M;
-    cols=['nom','prenom','sexe','ville','telephone','email','annee_arrivee','statut','specialite','quartier','direction','verification','date_inscription'];
-    heads=['Nom','Prénom','Sexe','Ville','Téléphone','Email','Année arrivée','Statut','Spécialité','Quartier','Participation','Vérification','Date inscription'];
+    // Colonnes = ce qui est visible dans le tableau membres
+    cols=['nom','prenom','ville','telephone','email','statut','specialite','annee_arrivee','direction','verification'];
+    heads=['Nom','Prénom','Ville','Téléphone','Email','Statut','Spécialité','Année arrivée','Participation','Vérification'];
     fn='AKF_membres';
   } else {
     data=fT.length?fT:T;
-    cols=['id','activite','commission','responsable','date_debut','date_fin','statut','priorite','relance','commentaires'];
-    heads=['ID','Activité','Commission','Responsable','Date début','Date fin','Statut','Priorité','Relance','Commentaires'];
+    // Colonnes = ce qui est visible dans le tableau taches
+    cols=['activite','commission','responsable','date_debut','date_fin','statut','priorite','commentaires'];
+    heads=['Activité','Commission','Responsable','Date début','Date fin','Statut','Priorité','Commentaires'];
     fn='AKF_taches';
   }
   let csv=heads.join(';')+'\n';
