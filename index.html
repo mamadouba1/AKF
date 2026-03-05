@@ -746,6 +746,16 @@ if('serviceWorker' in navigator){
       </div>
       <div class="fr"><label>Relance <span style="color:var(--mu);font-size:.72rem">(optionnel)</span></label><input id="at-relance" type="date"></div>
       <div class="fr full"><label>Commentaires / État d'avancement</label><textarea id="at-commentaires" rows="2" placeholder="Notes…"></textarea></div>
+      <div class="fr full" id="at-notif-wrap">
+        <label>✉️ Notifier des membres <span style="color:var(--mu);font-size:.72rem">(optionnel)</span></label>
+        <div style="position:relative">
+          <input id="at-notif-search" placeholder="Rechercher un membre…" autocomplete="off"
+            oninput="searchMembresNotif('at')"
+            style="width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:.83rem">
+          <div id="at-notif-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:100"></div>
+        </div>
+        <div id="at-notif-selected" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+      </div>
     </div>
     <div class="fa">
       <button class="btn bgh" onclick="closeOv('at')">Annuler</button>
@@ -774,6 +784,16 @@ if('serviceWorker' in navigator){
       </div>
       <div class="fr"><label>Relance <span style="color:var(--mu);font-size:.72rem">(optionnel)</span></label><input id="et-relance" type="date"></div>
       <div class="fr full"><label>Commentaires / État d'avancement</label><textarea id="et-commentaires" rows="2"></textarea></div>
+      <div class="fr full">
+        <label>✉️ Notifier des membres <span style="color:var(--mu);font-size:.72rem">(optionnel)</span></label>
+        <div style="position:relative">
+          <input id="et-notif-search" placeholder="Rechercher un membre…" autocomplete="off"
+            oninput="searchMembresNotif('et')"
+            style="width:100%;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:.83rem">
+          <div id="et-notif-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:100"></div>
+        </div>
+        <div id="et-notif-selected" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+      </div>
     </div>
     <div class="fa">
       <button class="btn bgh" onclick="closeOv('et')">Annuler</button>
@@ -1254,7 +1274,15 @@ function toast(msg, bg='#0f1923'){
   g('tw-wrap').appendChild(el); setTimeout(()=>el.remove(),3500);
 }
 function openOv(id){g('ov-'+id).classList.add('open');}
-function closeOv(id){g('ov-'+id).classList.remove('open');}
+function closeOv(id){
+  g('ov-'+id).classList.remove('open');
+  if(id==='at'||id==='et'){
+    notifSelected[id]=[];
+    renderNotifSelected(id);
+    const s=g(id+'-notif-search'); if(s) s.value='';
+    const d=g(id+'-notif-dropdown'); if(d) d.style.display='none';
+  }
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.ov.open').forEach(o=>o.classList.remove('open'));});
 
 const CMAP = {
@@ -1677,6 +1705,97 @@ g('em-ok').addEventListener('click',async()=>{
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// NOTIFICATION MEMBRES PAR MAIL (mailto — sans abonnement)
+// ═══════════════════════════════════════════════════════════════════
+let notifSelected = {at:[], et:[]};
+
+function searchMembresNotif(prefix){
+  const q = g(prefix+'-notif-search').value.toLowerCase().trim();
+  const dd = g(prefix+'-notif-dropdown');
+  if(!q){dd.style.display='none';return;}
+  const results = M.filter(m=>
+    m.email &&
+    (m.nom.toLowerCase().includes(q)||
+     m.prenom.toLowerCase().includes(q)||
+     m.email.toLowerCase().includes(q))
+  ).slice(0,8);
+  if(!results.length){dd.style.display='none';return;}
+  dd.innerHTML = results.map(m=>`
+    <div onclick="addNotifMembre('${prefix}','${m.nom}','${m.prenom}','${m.email}')"
+      style="padding:8px 12px;cursor:pointer;font-size:.82rem;border-bottom:1px solid #f1f5f9;
+             display:flex;align-items:center;gap:8px"
+      onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+      <div style="width:28px;height:28px;border-radius:50%;background:${ac(m.nom)};
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0">
+        ${ini(m.nom,m.prenom)}
+      </div>
+      <div>
+        <div style="font-weight:600">${m.nom} ${m.prenom}</div>
+        <div style="color:var(--mu);font-size:.72rem">${m.email}</div>
+      </div>
+    </div>`).join('');
+  dd.style.display='block';
+}
+
+function addNotifMembre(prefix, nom, prenom, email){
+  if(!email) return;
+  const already = notifSelected[prefix].find(x=>x.email===email);
+  if(already) return;
+  notifSelected[prefix].push({nom, prenom, email});
+  renderNotifSelected(prefix);
+  g(prefix+'-notif-search').value='';
+  g(prefix+'-notif-dropdown').style.display='none';
+}
+
+function removeNotifMembre(prefix, email){
+  notifSelected[prefix] = notifSelected[prefix].filter(x=>x.email!==email);
+  renderNotifSelected(prefix);
+}
+
+function renderNotifSelected(prefix){
+  const wrap = g(prefix+'-notif-selected');
+  wrap.innerHTML = notifSelected[prefix].map(m=>`
+    <span style="display:inline-flex;align-items:center;gap:5px;background:#e8f5ee;
+                 color:#0e7a45;border-radius:20px;padding:3px 10px 3px 7px;font-size:.75rem;font-weight:600">
+      ${m.prenom} ${m.nom}
+      <span onclick="removeNotifMembre('${prefix}','${m.email}')"
+        style="cursor:pointer;font-size:.9rem;line-height:1;opacity:.7">✕</span>
+    </span>`).join('');
+}
+
+function envoyerNotifTache(prefix, tache){
+  const destinataires = notifSelected[prefix];
+  if(!destinataires.length) return;
+  const emails = destinataires.map(x=>x.email).join(',');
+  const sujet = encodeURIComponent('Tâche à faire : ' + tache.activite);
+  const dd = tache.date_debut ? fmtD(tache.date_debut) : '—';
+  const df = tache.date_fin   ? fmtD(tache.date_fin)   : '—';
+  const corps = encodeURIComponent(
+    'Bonjour,\n\n' +
+    'Vous êtes attribué(e) pour réaliser la tâche suivante :\n\n' +
+    '📋 Tâche : ' + tache.activite + '\n' +
+    '📅 Date de début : ' + dd + '\n' +
+    '📅 Date de fin : ' + df + '\n\n' +
+    'Cordialement,\n' +
+    'Association des Kébémerois de France — AKF'
+  );
+  window.location.href = `mailto:${emails}?subject=${sujet}&body=${corps}`;
+  // Reset sélection
+  notifSelected[prefix] = [];
+  renderNotifSelected(prefix);
+}
+
+// Fermer dropdown si clic ailleurs
+document.addEventListener('click', e=>{
+  ['at','et'].forEach(p=>{
+    const dd=g(p+'-notif-dropdown');
+    const inp=g(p+'-notif-search');
+    if(dd&&inp&&!dd.contains(e.target)&&e.target!==inp) dd.style.display='none';
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // AJOUT / EDITION TÂCHES
 // ═══════════════════════════════════════════════════════════════════
 async function addTache(){
@@ -1697,6 +1816,7 @@ async function addTache(){
   if(btn){btn.disabled=false;btn.textContent='✅ Enregistrer';}
   closeOv('at'); refreshTaches();
   toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
+  if(notifSelected['at']?.length) envoyerNotifTache('at', t);
   ['at-activite','at-responsable','at-date_debut','at-date_fin','at-relance','at-commentaires'].forEach(id=>{g(id).value='';});
 }
 
@@ -1728,6 +1848,7 @@ g('et-ok').addEventListener('click',async()=>{
   updateKT(); drawChT(); renderTT(); // pas de reset page
   const ok=await sbUT(T[etiIdx]);
   toast(ok?'✅ Tâche mise à jour dans Supabase !':'⚠️ Mis à jour (hors-ligne, Supabase KO)',ok?'#0e7a45':'#b07d0a');
+  if(notifSelected['et']?.length) envoyerNotifTache('et', T[etiIdx]);
 });
 
 // ═══════════════════════════════════════════════════════════════════
