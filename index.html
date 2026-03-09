@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> Association des Kébémerois de France - A.K.F </title>
+  <title>Association des Kébémerois de France - A.K.F</title>
 <meta name="description" content="Association des Kébémerois de France (A.K.F) - Solidarité, partage et valorisation de Kébémer et de sa diaspora en France." />
 <meta name="keywords" content="Association Kébémerois France, AKF, Kébémer, diaspora sénégalaise, solidarité, Sénégal, France" />
 <meta name="robots" content="index, follow" />
@@ -1439,6 +1439,8 @@ async function actualiserCarte(){
   }
   if(btn){btn.disabled=false;btn.textContent='🔄 Actualiser la carte';}
 }
+
+async function geocodeAllMembres(){
   const inconnues=[...new Set(M.map(r=>r.ville).filter(v=>v&&GEO_CACHE[v]===undefined))];
   if(!inconnues.length) return;
   for(const v of inconnues){await geocodeVille(v);await new Promise(r=>setTimeout(r,300));}
