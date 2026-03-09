@@ -372,9 +372,28 @@ tbody td{padding:9px 12px;vertical-align:middle}
   <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('SW actif ✅'))
-      .catch(err => console.log('SW erreur:', err));
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW actif ✅');
+      // Vérifie si une nouvelle version est disponible
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+            // Nouvelle version disponible → on recharge automatiquement
+            newSW.postMessage({ type: 'SKIP_WAITING' });
+            window.location.reload();
+          }
+        });
+      });
+      // Vérifie une mise à jour au chargement
+      reg.update();
+    }).catch(err => console.log('SW erreur:', err));
+
+    // Recharge si le SW change (nouvel onglet ou retour sur l'app)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if(!refreshing){ refreshing = true; window.location.reload(); }
+    });
   });
 }
 </script>
