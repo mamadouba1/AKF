@@ -78,7 +78,9 @@
     .hero-text{flex:1;min-width:260px}
     .hero-title{font-family:"Montserrat",sans-serif;font-weight:800;line-height:1.1;margin:0 0 10px;font-size:clamp(1.8rem,3vw,2.4rem);color:var(--akf-vert)}
     .hero-sub{color:var(--mut);font-size:clamp(.98rem,1.6vw,1.05rem);margin:0}
-    .tabs{max-width:1100px;margin:14px auto 0;display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 22px}
+    .tabs{max-width:1100px;margin:14px auto 0;display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 10px}
+    .tabs-row1{justify-content:center;padding-bottom:8px;margin-bottom:0}
+    .tabs-row2{padding-top:0;margin-top:0;margin-bottom:0;padding-bottom:22px}
     .tab{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--wh);box-shadow:var(--sh);text-decoration:none;color:var(--ink);font-weight:700;font-size:.96rem;border:2px solid transparent;transition:all .2s}
     .tab:hover{transform:translateY(-1px);border-color:var(--akf-bleu)}
     .chip{font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
@@ -86,6 +88,11 @@
     .chip.pdf{background:linear-gradient(135deg,#E31B23,#b01017)}
     .tab.tab-pdf{border:2px solid #fde8e8;background:linear-gradient(135deg,#fff5f5,#fff);animation:pulse-pdf 2.5s ease-in-out infinite}
     @keyframes pulse-pdf{0%,100%{box-shadow:0 6px 24px rgba(227,27,35,.08)}50%{box-shadow:0 6px 24px rgba(227,27,35,.22)}}
+    .tab.tab-join{border:2px solid #bfdbfe;background:linear-gradient(135deg,#eff6ff,#fff);animation:pulse-join 2.5s ease-in-out infinite;padding:14px 40px;min-width:320px;justify-content:center;gap:14px}
+    .tab.tab-join .chip.join{font-size:.85rem;padding:5px 14px}
+    .tab.tab-join span:last-child{font-size:1.05rem;font-weight:800;color:var(--akf-bleu)}
+    @keyframes pulse-join{0%,100%{box-shadow:0 6px 24px rgba(30,64,175,.10)}50%{box-shadow:0 8px 28px rgba(30,64,175,.28)}}
+    .chip.join{background:linear-gradient(135deg,#1E40AF,#2563eb)}
     /* Modal PDF viewer */
     .pdf-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999}
     .pdf-modal-ov.open{display:flex}
@@ -113,7 +120,7 @@
     .pub-btn:hover{filter:brightness(.96)}.pub-btn:active{transform:translateY(1px)}
     .pub-btn.alt{background:var(--akf-bleu);box-shadow:0 6px 18px rgba(30,64,175,.18)}
     .pub-btn:disabled{opacity:.6;cursor:not-allowed}
-    .admin-btn-fixed{position:fixed;top:12px;right:12px;z-index:500}
+    .admin-btn-fixed{display:none}
     .ov-pub{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:600}
     .ov-pub.open{display:flex}
     .modal-pub{background:#fff;border-radius:16px;box-shadow:var(--sh);width:min(420px,92vw);padding:20px}
@@ -404,8 +411,7 @@ if('serviceWorker' in navigator){
 ══════════════════════════════════════════════════════ -->
 <div id="page-public">
 
-  <!-- Bouton Admin -->
-  <button class="pub-btn alt admin-btn-fixed" id="adminBtn" type="button">🔒 Admin</button>
+  <!-- Bouton Admin (déplacé en bas) -->
 
   <!-- Modal mot de passe -->
   <div class="ov-pub" id="adminOv">
@@ -432,13 +438,21 @@ if('serviceWorker' in navigator){
         <p class="hero-sub">Rassembler la communauté kébémeroise en France autour de l'entraide, la solidarité et le partage culturel. Participez à nos événements et renforcez les liens avec notre ville d'origine, Kébémer.</p>
       </div>
     </div>
-    <div class="tabs">
+    <!-- Ligne 1 : Rejoignez-nous centré seul -->
+    <div class="tabs tabs-row1">
+      <a class="tab tab-join" href="#" onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'});return false;">
+        <span class="chip join">🧭 Rejoignez-nous</span>
+        <span>Devenez membre AKF</span>
+      </a>
+    </div>
+    <!-- Ligne 2 : Réseaux sociaux + En savoir plus -->
+    <div class="tabs tabs-row2">
       <a class="tab" href="https://www.instagram.com/asso_kebemerois_de_france" target="_blank" rel="noopener"><span class="chip ig">Instagram</span><span>Suivre</span></a>
       <a class="tab" href="https://www.tiktok.com/@akf.asso.kbmrois" target="_blank" rel="noopener"><span class="chip tk">TikTok</span><span>Suivre</span></a>
       <a class="tab" href="https://www.facebook.com/profile.php?id=61588628498199" target="_blank" rel="noopener"><span class="chip fb">Facebook</span><span>Suivre</span></a>
       <a class="tab tab-pdf" href="#" onclick="openPDF(event)" rel="noopener">
         <span class="chip pdf">📄 Découvrir l'AKF</span>
-        <span>Vous voulez en savoir plus sur nous ?</span>
+        <span>En savoir plus</span>
       </a>
     </div>
   </section>
@@ -494,21 +508,8 @@ if('serviceWorker' in navigator){
       </ul>
     </div>
     <div class="accordion">
-      <!-- CONTACT -->
-      <details>
-        <summary>📩 Contactez‑nous</summary>
-        <div class="acc-body">
-          <div class="row two">
-            <div><label>Votre nom</label><input id="c_nom" placeholder="Nom complet"></div>
-            <div><label>Email ou téléphone</label><input id="c_contact" placeholder="ex. nom@email.com"></div>
-          </div>
-          <label>Votre message</label>
-          <textarea id="c_message" rows="5" placeholder="Écrivez votre message ici…"></textarea>
-          <button class="pub-btn" type="button" id="btnContact">Envoyer le message</button>
-        </div>
-      </details>
-      <!-- INSCRIPTION -->
-      <details>
+      <!-- INSCRIPTION (maintenant en premier, avec id pour le scroll) -->
+      <details id="details-inscription">
         <summary>🧭 Rejoignez‑nous</summary>
         <div class="acc-body">
           <div class="row two">
@@ -537,6 +538,23 @@ if('serviceWorker' in navigator){
           </div>
         </div>
       </details>
+      <!-- CONTACT -->
+      <details>
+        <summary>📩 Contactez‑nous</summary>
+        <div class="acc-body">
+          <div class="row two">
+            <div><label>Votre nom</label><input id="c_nom" placeholder="Nom complet"></div>
+            <div><label>Email ou téléphone</label><input id="c_contact" placeholder="ex. nom@email.com"></div>
+          </div>
+          <label>Votre message</label>
+          <textarea id="c_message" rows="5" placeholder="Écrivez votre message ici…"></textarea>
+          <button class="pub-btn" type="button" id="btnContact">Envoyer le message</button>
+        </div>
+      </details>
+    </div>
+    <!-- Bouton Admin en bas -->
+    <div style="display:flex;justify-content:center;margin:28px 0 8px">
+      <button class="pub-btn alt" id="adminBtn" type="button" style="padding:10px 28px;font-size:.88rem;opacity:.55;filter:grayscale(.3)">🔒 Accès Admin</button>
     </div>
     <div class="footer-pub">© <span id="year"></span> AKF – Association des Kébémerois de France · Tous droits réservés</div>
   </main>
