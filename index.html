@@ -1118,12 +1118,25 @@ adminOv.addEventListener('click',e=>{if(e.target===adminOv)adminOv.classList.rem
 admEnter.addEventListener('click',checkAdmin);
 admPwdInp.addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();if(e.key==='Escape')adminOv.classList.remove('open');});
 
-function checkAdmin(){
-  if(admPwdInp.value==='@Kebemer25@'){
+async function checkAdmin(){
+  const pwd = admPwdInp.value.trim();
+  if(!pwd) return;
+
+  admEnter.disabled = true;
+  admEnter.textContent = '⏳';
+
+  const { data, error } = await _sbPub.auth.signInWithPassword({
+    email: 'assokebefrance@gmail.com',
+    password: pwd
+  });
+
+  admEnter.disabled = false;
+  admEnter.textContent = 'Entrer';
+
+  if (!error && data.user) {
     adminOv.classList.remove('open');
     document.getElementById('page-public').style.display='none';
     document.getElementById('page-admin').style.display='block';
-    // Lancer init APRÈS que le DOM soit visible (Leaflet a besoin des dimensions)
     setTimeout(()=>{ initDashboard(); }, 150);
   } else {
     admPwdInp.style.borderColor='#E31B23';
@@ -1133,10 +1146,11 @@ function checkAdmin(){
   }
 }
 
-function logout(){
+async function logout(){
+  await _sbPub.auth.signOut();
   document.getElementById('page-admin').style.display='none';
   document.getElementById('page-public').style.display='block';
-  _dashboardInited = false; // Reset pour permettre un rechargement à la prochaine connexion
+  _dashboardInited = false;
 }
 
 // ── EmailJS ───────────────────────────────────────────
