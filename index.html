@@ -424,7 +424,7 @@ if('serviceWorker' in navigator){
       <input id="admEmail" type="email" placeholder="admin@akf.fr" autocomplete="email" style="margin-bottom:10px"/>
       <label for="admPwd">Mot de passe</label>
       <input id="admPwd" type="password" placeholder="••••••••" autocomplete="current-password" />
-      <p id="admError" style="color:#E31B23;font-size:.88rem;margin:6px 0 0;display:none">Email ou mot de passe incorrect.</p>
+      <p id="admError" style="color:#E31B23;font-size:.88rem;margin:6px 0 0;display:none"></p>
       <div class="actions">
         <button class="pub-btn alt" id="admClose" type="button">Annuler</button>
         <button class="pub-btn" id="admEnter" type="button">Connexion</button>
@@ -516,15 +516,15 @@ if('serviceWorker' in navigator){
           </div>
           <div class="row two">
             <div><label>Sexe</label><select id="i_sexe"><option>Homme</option><option>Femme</option></select></div>
-            <div><label>Ville</label><input id="i_ville" placeholder="Compiègne"></div>
+            <div><label>Ville *</label><input id="i_ville" placeholder="Compiègne"></div>
           </div>
           <div class="row two">
-            <div><label>Téléphone</label><input id="i_telephone" placeholder="07…"></div>
-            <div><label>Email</label><input id="i_email" type="email" placeholder="exemple@email.com"></div>
+            <div><label>Téléphone *</label><input id="i_telephone" placeholder="07…"></div>
+            <div><label>Email *</label><input id="i_email" type="email" placeholder="exemple@email.com"></div>
           </div>
           <div class="row two">
             <div><label>Année d'arrivée</label><input id="i_annee" type="number" min="1990" max="2035" placeholder="2023"></div>
-            <div><label>Statut</label><select id="i_statut"><option>Professionnel</option><option>Étudiant</option><option>Autres</option></select></div>
+            <div><label>Statut *</label><select id="i_statut"><option>Professionnel</option><option>Étudiant</option><option>Autres</option></select></div>
           </div>
           <div class="row two">
             <div><label>Spécialité</label><input id="i_specialite" placeholder="Informatique…"></div>
@@ -1124,16 +1124,12 @@ const admEmailInp = document.getElementById('admEmail');
 if(admEmailInp) admEmailInp.addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();if(e.key==='Escape')adminOv.classList.remove('open');});
 
 function checkAdmin(){
-  const email = document.getElementById('admEmail').value.trim();
+  const email = document.getElementById('admEmail') ? document.getElementById('admEmail').value.trim() : 'assokebefrance@gmail.com';
   const pwd   = admPwdInp.value.trim();
   const errEl = document.getElementById('admError');
-  errEl.style.display = 'none';
+  if(errEl) errEl.style.display = 'none';
 
-  if(!email || !pwd){
-    errEl.textContent = 'Veuillez remplir email et mot de passe.';
-    errEl.style.display = 'block';
-    return;
-  }
+  if(!pwd){ if(errEl){errEl.textContent='Veuillez remplir le mot de passe.';errEl.style.display='block';} return; }
 
   admEnter.disabled = true;
   admEnter.textContent = '⏳';
@@ -1141,16 +1137,15 @@ function checkAdmin(){
   _sbPub.auth.signInWithPassword({ email, password: pwd }).then(({ data, error }) => {
     admEnter.disabled = false;
     admEnter.textContent = 'Connexion';
-
     if (!error && data.user) {
-      errEl.style.display = 'none';
+      if(errEl) errEl.style.display = 'none';
       adminOv.classList.remove('open');
       document.getElementById('page-public').style.display = 'none';
       document.getElementById('page-admin').style.display = 'block';
       setTimeout(() => { initDashboard(); }, 150);
     } else {
-      errEl.textContent = 'Email ou mot de passe incorrect.';
-      errEl.style.display = 'block';
+      if(errEl){ errEl.textContent = 'Mot de passe incorrect.'; errEl.style.display = 'block'; }
+      else { alert('Mot de passe incorrect.'); }
       admPwdInp.value = '';
       admPwdInp.focus();
     }
@@ -1194,7 +1189,6 @@ document.getElementById('btnRegister').addEventListener('click',async()=>{
   const btn=document.getElementById('btnRegister');
   const nom=document.getElementById('i_nom').value.toUpperCase().trim();
   const prenom=document.getElementById('i_prenom').value.trim();
-  if(!nom||!prenom){alert('Nom et Prénom sont obligatoires.');return;}
   const sexe_id=document.getElementById('i_sexe').value==='Homme'?1:2;
   const ville=document.getElementById('i_ville').value.trim();
   const telephone=document.getElementById('i_telephone').value.trim();
@@ -1205,7 +1199,45 @@ document.getElementById('btnRegister').addEventListener('click',async()=>{
   const specialite=document.getElementById('i_specialite').value.trim();
   const quartier=document.getElementById('i_quartier').value.trim();
   const date_inscription=document.getElementById('i_date').value||null;
-  btn.disabled=true;btn.textContent='⏳ Enregistrement…';
+
+  // ── Champs obligatoires ──
+  const manquants = [];
+  if(!nom) manquants.push('Nom');
+  if(!prenom) manquants.push('Prénom');
+  if(!ville) manquants.push('Ville');
+  if(!telephone) manquants.push('Téléphone');
+  if(!email) manquants.push('Email');
+  if(!statutSel) manquants.push('Statut');
+  if(manquants.length){
+    alert('Champs obligatoires manquants : ' + manquants.join(', '));
+    return;
+  }
+
+  // ── Validation email format ──
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    alert('Adresse email invalide.');
+    return;
+  }
+
+  btn.disabled=true; btn.textContent='⏳ Vérification…';
+
+  // ── Vérification email unique ──
+  const {data: existEmail} = await _sbPub.from('inscrits').select('id').eq('email', email).limit(1);
+  if(existEmail && existEmail.length > 0){
+    btn.disabled=false; btn.textContent="S'inscrire";
+    alert('❌ Cette adresse email est déjà utilisée. Vous êtes peut-être déjà inscrit(e).');
+    return;
+  }
+
+  // ── Vérification téléphone unique ──
+  const {data: existTel} = await _sbPub.from('inscrits').select('id').eq('telephone', telephone).limit(1);
+  if(existTel && existTel.length > 0){
+    btn.disabled=false; btn.textContent="S'inscrire";
+    alert('❌ Ce numéro de téléphone est déjà utilisé. Vous êtes peut-être déjà inscrit(e).');
+    return;
+  }
+
+  btn.textContent='⏳ Enregistrement…';
   const{error}=await _sbPub.from('inscrits').insert([{
     nom,prenom,sexe_id,ville,telephone,email,
     annee_arrivee:annee_arrivee?parseInt(annee_arrivee,10):null,
@@ -1214,8 +1246,8 @@ document.getElementById('btnRegister').addEventListener('click',async()=>{
   if(error){btn.disabled=false;btn.textContent="S'inscrire";alert('Erreur : '+error.message);return;}
   try{await emailjs.send(EMAILJS_SERVICE,TEMPLATE_ADMIN,{name:`${nom} ${prenom}`,email,telephone,ville,statut:statutSel,quartier,specialite,message:'Nouvelle inscription via le site AKF.',time:new Date().toLocaleString('fr-FR')});}catch(e){console.warn(e);}
   try{await emailjs.send(EMAILJS_SERVICE,TEMPLATE_USER,{name:prenom,to_email:email});}catch(e){console.warn(e);}
-  btn.disabled=false;btn.textContent="S'inscrire";
-  alert("Inscription enregistrée ! Bienvenue à l'AKF 🎉");
+  btn.disabled=false; btn.textContent="S'inscrire";
+  alert("✅ Inscription enregistrée ! Bienvenue à l'AKF 🎉");
   ['i_nom','i_prenom','i_ville','i_telephone','i_email','i_annee','i_specialite','i_quartier','i_date'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('i_sexe').value='Homme';
   document.getElementById('i_statut').value='Professionnel';
