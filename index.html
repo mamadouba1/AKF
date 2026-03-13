@@ -48,6 +48,11 @@
   <!-- CDN Supabase + EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <!-- CDN Carte Membre -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- CDN Dashboard -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -60,47 +65,128 @@
   <!-- ══ CSS PAGE PUBLIQUE ══ -->
   <style>
     :root{
-      --akf-vert:#00853F; --akf-jaune:#FDEF42; --akf-rouge:#E31B23; --akf-bleu:#1E40AF;
-      --ink:#0f172a; --mut:#64748b; --bg-pub:#f3f4f6; --wh:#fff;
-      --r:14px; --sh:0 6px 24px rgba(0,0,0,.08);
+      --akf-vert:#00853F;--akf-jaune:#FDEF42;--akf-rouge:#E31B23;--akf-bleu:#1E40AF;
+      --ink:#0f172a;--mut:#64748b;--bg-pub:#f3f4f6;--wh:#fff;
+      --r:14px;--sh:0 6px 24px rgba(0,0,0,.08);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:"DM Sans",system-ui,Arial;background:var(--bg-pub);color:var(--ink)}
-
-    /* PAGE PUBLIQUE */
     #page-public{display:block}
     #page-admin{display:none}
 
-    .hero{position:relative;background:radial-gradient(1200px 400px at 20% -10%,rgba(0,133,63,.18),transparent 60%),radial-gradient(1200px 400px at 80% -10%,rgba(30,64,175,.18),transparent 60%),linear-gradient(135deg,#f8fafc 0%,#eef2ff 100%);border-bottom:6px solid var(--akf-vert)}
-    .hero-wrap{max-width:1100px;margin:0 auto;padding:28px 16px 22px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-    .logo-box{background:var(--wh);border-radius:16px;padding:10px;box-shadow:var(--sh);display:flex;align-items:center;justify-content:center}
-    .logo-box img{display:block;height:110px;width:auto;border-radius:10px;user-select:none}
-    .hero-text{flex:1;min-width:260px}
-    .hero-title{font-family:"Montserrat",sans-serif;font-weight:800;line-height:1.1;margin:0 0 10px;font-size:clamp(1.8rem,3vw,2.4rem);color:var(--akf-vert)}
-    .hero-sub{color:var(--mut);font-size:clamp(.98rem,1.6vw,1.05rem);margin:0}
+    /* ══ NAVBAR FIXE ══ */
+    .akf-nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(0,32,74,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .akf-nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:4px}
+    .akf-nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:20px;flex-shrink:0}
+    .akf-nav-logo img{height:36px;width:36px;border-radius:8px;object-fit:cover}
+    .akf-nav-logo span{font-family:"Montserrat",sans-serif;font-weight:800;color:#fff;font-size:.9rem}
+    .akf-nav-links{display:flex;align-items:center;gap:2px;flex:1}
+    .akf-nav-link{padding:7px 11px;border-radius:8px;color:rgba(255,255,255,.72);font-size:.81rem;font-weight:600;cursor:pointer;transition:all .18s;border:none;background:none;font-family:"DM Sans",sans-serif;white-space:nowrap;text-decoration:none}
+    .akf-nav-link:hover{color:#fff;background:rgba(255,255,255,.1)}
+    .akf-nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+    .akf-nav-btn{padding:8px 14px;border-radius:8px;font-weight:700;font-size:.8rem;border:none;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap;transition:all .18s}
+    .akf-nav-btn.join{background:var(--akf-vert);color:#fff}
+    .akf-nav-btn.join:hover{filter:brightness(1.1)}
+    .akf-nav-btn.dash{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.18)}
+    .akf-nav-btn.dash:hover{background:rgba(255,255,255,.2);color:#fff}
+    /* Burger mobile */
+    .akf-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;margin-left:8px}
+    .akf-burger span{display:block;width:22px;height:2px;background:rgba(255,255,255,.85);border-radius:2px}
+    .akf-mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;z-index:899;background:rgba(0,32,74,.98);padding:10px 14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .akf-mobile-menu.open{display:block}
+    .akf-mobile-link{display:block;width:100%;padding:12px 14px;color:rgba(255,255,255,.85);font-size:.9rem;font-weight:600;border-radius:10px;margin-bottom:3px;cursor:pointer;border:none;background:none;font-family:"DM Sans",sans-serif;text-align:left}
+    .akf-mobile-link:hover{background:rgba(255,255,255,.1)}
+    @media(max-width:820px){
+      .akf-nav-links,.akf-nav-right{display:none}
+      .akf-burger{display:flex}
+    }
+
+    /* ══ HERO ══ */
+    .akf-hero{position:relative;margin-top:64px;overflow:hidden;height:55vw;max-height:560px;min-height:320px;background:#00204A}
+    .akf-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;display:block}
+    .akf-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,20,60,.02) 0%,rgba(0,20,60,.35) 55%,rgba(0,20,60,.82) 100%)}
+    .akf-hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 28px 36px;max-width:1200px;margin:0 auto}
+    .akf-hero-title{font-family:"Montserrat",sans-serif;font-weight:800;font-size:clamp(1.3rem,2.8vw,2.2rem);color:#fff;margin:0 0 8px;line-height:1.2;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+    .akf-hero-sub{color:rgba(255,255,255,.88);font-size:clamp(.85rem,1.4vw,.98rem);margin:0 0 18px;line-height:1.6;max-width:600px;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+    @media(max-width:600px){.akf-hero-content{padding:0 14px 22px}}
+
+    /* ══ ANCIEN CSS CONSERVÉ INTACT ══ */
+    .hero{display:none}
+    .btn-join-fixed{display:none}
     .tabs{max-width:1100px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 22px}
     .tabs-row1{display:none}
     .tabs-row2{padding-top:10px}
     .tab{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--wh);box-shadow:var(--sh);text-decoration:none;color:var(--ink);font-weight:700;font-size:.96rem;border:2px solid transparent;transition:all .2s}
     .tab:hover{transform:translateY(-1px);border-color:var(--akf-bleu)}
-    /* Bouton Rejoignez-nous fixe en haut à droite */
-    .btn-join-fixed{position:fixed;top:14px;right:14px;z-index:500;display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:12px;background:linear-gradient(135deg,#1E40AF,#2563eb);color:#fff;font-weight:800;font-size:.9rem;font-family:"DM Sans",sans-serif;text-decoration:none;box-shadow:0 4px 18px rgba(30,64,175,.35);border:none;cursor:pointer;animation:pulse-join 2.5s ease-in-out infinite;transition:transform .15s}
-    .btn-join-fixed:hover{transform:translateY(-1px);filter:brightness(1.08)}
-    @keyframes pulse-join{0%,100%{box-shadow:0 4px 18px rgba(30,64,175,.30)}50%{box-shadow:0 6px 26px rgba(30,64,175,.55)}}
     .chip{font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
     .chip.ig{background:#E4405F}.chip.tk{background:#000}.chip.fb{background:#1877F2}
     .chip.pdf{background:linear-gradient(135deg,#E31B23,#b01017)}
+    .chip.carte{background:linear-gradient(135deg,#00204A,#1E40AF)}
     .tab.tab-pdf{border:2px solid #fde8e8;background:linear-gradient(135deg,#fff5f5,#fff);animation:pulse-pdf 2.5s ease-in-out infinite}
+    .tab.tab-carte-membre{border:2px solid #dbeafe;background:linear-gradient(135deg,#eff6ff,#fff);animation:pulse-carte 2.5s ease-in-out infinite}
     @keyframes pulse-pdf{0%,100%{box-shadow:0 6px 24px rgba(227,27,35,.08)}50%{box-shadow:0 6px 24px rgba(227,27,35,.22)}}
-    /* Modal PDF viewer */
+    @keyframes pulse-carte{0%,100%{box-shadow:0 6px 24px rgba(0,32,74,.08)}50%{box-shadow:0 6px 24px rgba(0,32,74,.28)}}
+    /* Carte membre */
+    .carte-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
+    .carte-modal-ov.open{display:flex}
+    .carte-modal-box{background:#fff;border-radius:20px;width:min(640px,98vw);max-height:95vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.28);display:flex;flex-direction:column}
+    .carte-modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:2px solid #f1f5f9;flex-shrink:0;background:linear-gradient(135deg,#00204A,#1E40AF);border-radius:20px 20px 0 0}
+    .carte-modal-header h3{font-family:"Montserrat",sans-serif;font-size:1.05rem;font-weight:800;color:#fff;margin:0}
+    .carte-modal-close{background:rgba(255,255,255,.15);border:none;font-size:1.1rem;cursor:pointer;color:#fff;line-height:1;padding:5px 9px;border-radius:8px;transition:background .15s}
+    .carte-modal-close:hover{background:rgba(255,255,255,.28)}
+    .carte-modal-body{padding:22px;flex:1}
+    .photo-upload-zone{border:2px dashed #cbd5e1;border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#f8fafc;margin-bottom:4px}
+    .photo-upload-zone:hover{border-color:#1E40AF;background:#eff6ff}
+    .photo-upload-zone p{margin:0;font-size:.8rem;color:#94a3b8;font-weight:600}
+    .carte-preview{border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,32,74,.18);border:1.5px solid #e2e8f0;background:#fff}
+    .carte-flag{display:grid;grid-template-columns:1fr 1fr 1fr;height:8px}
+    .carte-flag .f1{background:#00853F}.carte-flag .f2{background:#FDEF42}.carte-flag .f3{background:#E31B23}
+    .carte-inner{padding:18px 20px 16px}
+    .carte-header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+    .carte-title-block h4{font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#00204A;margin:0 0 5px}
+    .carte-badge{display:inline-block;background:#00204A;color:#fff;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.1em;text-transform:uppercase}
+    .carte-logo{height:44px;width:auto;object-fit:contain;mix-blend-multiply}
+    .carte-body-row{display:flex;gap:14px;align-items:flex-start}
+    .carte-photo{width:72px;height:90px;object-fit:cover;border-radius:8px;border:2px solid #00204A;flex-shrink:0}
+    .carte-info{flex:1}
+    .carte-nom{font-family:"Montserrat",sans-serif;font-weight:800;font-size:1.05rem;color:#00204A;text-transform:uppercase;line-height:1.15;margin-bottom:4px}
+    .carte-fonction{font-weight:700;font-size:.82rem;color:#00853F;margin-bottom:10px}
+    .carte-details{background:#f8fafc;border-radius:8px;padding:8px 12px;border:1px solid #e2e8f0}
+    .carte-detail-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
+    .carte-detail-row+.carte-detail-row{border-top:1px solid #e2e8f0;margin-top:4px;padding-top:4px}
+    .carte-detail-label{font-family:"Montserrat",sans-serif;font-size:.58rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}
+    .carte-detail-val{font-size:.72rem;font-weight:700;color:#00204A}
+    .carte-detail-val.green{color:#00853F}
+    .carte-sigs{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9;gap:6px}
+    .carte-sig{flex:1;text-align:center}
+    .carte-sig-line{height:28px;border-bottom:1.5px solid rgba(0,32,74,.25);margin-bottom:4px}
+    .carte-sig-label{font-family:"Montserrat",sans-serif;font-size:.58rem;font-weight:700;color:#00204A;text-transform:uppercase;letter-spacing:.06em;margin:0;line-height:1.4}
+    .carte-type-step{padding:22px}
+    .carte-type-step h4{font-family:"Montserrat",sans-serif;font-size:1rem;font-weight:800;color:#00204A;margin:0 0 6px;text-align:center}
+    .carte-type-step p{color:#64748b;font-size:.88rem;text-align:center;margin:0 0 20px}
+    .carte-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .carte-type-card{border:2.5px solid #e2e8f0;border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .22s;background:#fff;position:relative;overflow:hidden}
+    .carte-type-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    .carte-type-card.bronze{--c:#CD7F32}.carte-type-card.silver{--c:#9EA9B0}.carte-type-card.gold{--c:#D4AF37}.carte-type-card.platinum{--c:#1E40AF}
+    .carte-type-card.selected{border-color:var(--c);box-shadow:0 0 0 3px rgba(0,0,0,.08),0 6px 20px rgba(0,0,0,.1)}
+    .carte-type-badge-img{width:72px;height:72px;object-fit:contain;margin:0 auto 8px;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.18));transition:transform .2s}
+    .carte-type-card:hover .carte-type-badge-img{transform:scale(1.08)}
+    .carte-type-name{font-family:"Montserrat",sans-serif;font-weight:800;font-size:.88rem;color:var(--c,#00204A);margin-bottom:3px}
+    .carte-type-price{font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.1rem;color:#0f172a}
+    .carte-type-check{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.7rem;color:#fff;background:var(--c,#00204A)}
+    .carte-type-card.selected .carte-type-check{display:flex}
+    .carte-type-cta{width:100%;padding:13px;background:linear-gradient(135deg,#00204A,#1E40AF);color:#fff;border:none;border-radius:12px;font-family:"Montserrat",sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:filter .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .carte-type-cta:hover{filter:brightness(1.1)}.carte-type-cta:active{transform:translateY(1px)}.carte-type-cta:disabled{opacity:.45;cursor:not-allowed}
+    /* PDF modal */
     .pdf-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999}
     .pdf-modal-ov.open{display:flex}
     .pdf-modal-box{background:#fff;border-radius:16px;width:min(900px,96vw);height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.3)}
     .pdf-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
-    .pdf-modal-header h3{font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:800;color:#00204A;margin:0}
+    .pdf-modal-header h3{font-family:"Montserrat",sans-serif;font-size:1rem;font-weight:800;color:#00204A;margin:0}
     .pdf-modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b;line-height:1;padding:4px 8px;border-radius:6px}
     .pdf-modal-close:hover{background:#f1f5f9}
     .pdf-modal-frame{flex:1;border:none;width:100%}
+    /* Contenu public */
     .section-pub{max-width:1100px;margin:18px auto;padding:0 16px}
     .card-pub{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:22px}
     .card-pub h2{margin:0 0 12px;font-family:"Montserrat",sans-serif;color:var(--akf-bleu);font-size:1.4rem}
@@ -116,16 +202,21 @@
     .row{display:flex;gap:10px;flex-wrap:wrap}.two>*{flex:1 1 260px}
     .acc-body .pub-btn{margin-top:12px}
     .pub-btn{appearance:none;border:none;border-radius:10px;padding:12px 18px;font-weight:800;font-size:1rem;font-family:inherit;cursor:pointer;color:#fff;background:var(--akf-vert);box-shadow:0 6px 18px rgba(0,133,63,.18);transition:transform .1s,filter .2s}
-    .pub-btn:hover{filter:brightness(.96)}.pub-btn:active{transform:translateY(1px)}
+    .pub-btn:hover{filter:brightness(.96)}.pub-btn:active{transform:translateY(1px)}.pub-btn:disabled{opacity:.6;cursor:not-allowed}
     .pub-btn.alt{background:var(--akf-bleu);box-shadow:0 6px 18px rgba(30,64,175,.18)}
-    .pub-btn:disabled{opacity:.6;cursor:not-allowed}
-    .admin-btn-fixed{display:none}
     .ov-pub{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:600}
     .ov-pub.open{display:flex}
     .modal-pub{background:#fff;border-radius:16px;box-shadow:var(--sh);width:min(420px,92vw);padding:20px}
     .modal-pub h3{margin:0 0 8px;font-family:"Montserrat";color:var(--akf-bleu)}
     .modal-pub .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
     .footer-pub{margin:26px 0 40px;text-align:center;color:var(--mut);font-size:.9rem}
+    /* Don modal */
+    .don-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
+    .don-modal-ov.open{display:flex}
+    .don-modal-box{background:#fff;border-radius:20px;width:min(520px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.28)}
+    .don-modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;background:linear-gradient(135deg,#b45309,#e67e22);border-radius:20px 20px 0 0}
+    .don-modal-header h3{font-family:"Montserrat",sans-serif;font-weight:800;color:#fff;margin:0;font-size:1rem}
+    .don-modal-close{background:rgba(255,255,255,.18);border:none;font-size:1.1rem;cursor:pointer;color:#fff;padding:5px 9px;border-radius:8px;line-height:1}
   </style>
 
   <!-- ══ CSS DASHBOARD (admin) ══ -->
@@ -410,7 +501,133 @@ if('serviceWorker' in navigator){
 ══════════════════════════════════════════════════════ -->
 <div id="page-public">
 
-  <!-- Bouton Rejoignez-nous fixe en haut à droite -->
+  <!-- ══ NAVBAR ══ -->
+  <nav class="akf-nav">
+    <div class="akf-nav-inner">
+      <a class="akf-nav-logo" href="#">
+        <img src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg" alt="Logo AKF">
+        <span>A.K.F</span>
+      </a>
+      <div class="akf-nav-links">
+        <a class="akf-nav-link" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">🏠 Accueil</a>
+        <a class="akf-nav-link" href="#" onclick="openPDF(event)">📖 Découvrir l'AKF</a>
+        <a class="akf-nav-link" href="#" onclick="openDonModal(event)">💛 Faire un Don</a>
+        <a class="akf-nav-link" href="#" onclick="openCarteMembre(event)">🪪 Carte Membre</a>
+        <a class="akf-nav-link" href="#" onclick="openReseauxModal(event)">📱 Réseaux sociaux</a>
+      </div>
+      <div class="akf-nav-right">
+        <button class="akf-nav-btn join" onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'})">🧭 Rejoindre l'AKF</button>
+        <button class="akf-nav-btn dash" id="adminBtn" type="button">🔒 Tableau de bord</button>
+      </div>
+      <button class="akf-burger" id="burgerBtn" onclick="document.getElementById('mobileMenu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══ MENU MOBILE ══ -->
+  <div class="akf-mobile-menu" id="mobileMenu">
+    <a class="akf-mobile-link" href="#" onclick="window.scrollTo({top:0});document.getElementById('mobileMenu').classList.remove('open');return false">🏠 Accueil</a>
+    <a class="akf-mobile-link" href="#" onclick="openPDF(event);document.getElementById('mobileMenu').classList.remove('open')">📖 Découvrir l'AKF</a>
+    <a class="akf-mobile-link" href="#" onclick="openDonModal(event);document.getElementById('mobileMenu').classList.remove('open')">💛 Faire un Don</a>
+    <a class="akf-mobile-link" href="#" onclick="openCarteMembre(event);document.getElementById('mobileMenu').classList.remove('open')">🪪 Carte Membre</a>
+    <a class="akf-mobile-link" href="#" onclick="openReseauxModal(event);document.getElementById('mobileMenu').classList.remove('open')">📱 Réseaux sociaux</a>
+    <button class="akf-mobile-link" onclick="document.getElementById('adminOv').classList.add('open');document.getElementById('mobileMenu').classList.remove('open')">🔒 Tableau de bord</button>
+    <button class="akf-mobile-link" onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open')">🧭 Rejoindre l'AKF</button>
+  </div>
+
+  <!-- ══ HERO PHOTO DE COUVERTURE ══ -->
+  <div class="akf-hero">
+    <img class="akf-hero-img" src="https://i.postimg.cc/Kv8Qv8SK/photo-de-couverture-(1).png" alt="Association des Kébémerois de France" onerror="this.style.display='none'">
+    <div class="akf-hero-overlay"></div>
+    <div class="akf-hero-content">
+      <h1 class="akf-hero-title">Association des Kébémerois de France</h1>
+      <p class="akf-hero-sub">Rassembler la communauté kébémeroise en France autour de l'entraide, la solidarité et le partage culturel.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <button onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'})" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:var(--akf-vert);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:filter .18s;box-shadow:0 4px 14px rgba(0,133,63,.35)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">🧭 Rejoindre l'AKF</button>
+        <button onclick="document.getElementById('donModalOv').classList.add('open')" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:#e67e22;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:filter .18s;box-shadow:0 4px 14px rgba(230,126,34,.35)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">💛 Faire un Don</button>
+        <button onclick="openCarteMembre(event)" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;backdrop-filter:blur(6px);transition:background .18s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">🪪 Carte Membre</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL RÉSEAUX SOCIAUX ══ -->
+  <div class="don-modal-ov" id="reseauxModalOv">
+    <div class="don-modal-box">
+      <div class="don-modal-header">
+        <h3>📱 Nos Réseaux Sociaux</h3>
+        <button class="don-modal-close" onclick="document.getElementById('reseauxModalOv').classList.remove('open')">✕</button>
+      </div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:10px">
+        <a href="https://www.instagram.com/asso_kebemerois_de_france" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);text-decoration:none;color:#fff;font-weight:700">
+          <svg viewBox="0 0 24 24" width="24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800">Instagram</div><div style="font-size:.8rem;opacity:.85">@asso_kebemerois_de_france</div></div>
+          <span style="margin-left:auto">Suivre →</span>
+        </a>
+        <a href="https://www.tiktok.com/@akf.asso.kbmrois" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#010101;text-decoration:none;color:#fff;font-weight:700">
+          <svg viewBox="0 0 24 24" width="24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800">TikTok</div><div style="font-size:.8rem;opacity:.85">@akf.asso.kbmrois</div></div>
+          <span style="margin-left:auto">Suivre →</span>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61588628498199" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#1877F2;text-decoration:none;color:#fff;font-weight:700">
+          <svg viewBox="0 0 24 24" width="24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800">Facebook</div><div style="font-size:.8rem;opacity:.85">Association des Kébémerois de France</div></div>
+          <span style="margin-left:auto">Suivre →</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL DON ══ -->
+  <div class="don-modal-ov" id="donModalOv">
+    <div class="don-modal-box">
+      <div class="don-modal-header">
+        <h3>💛 Faire un Don à l'AKF</h3>
+        <button class="don-modal-close" onclick="document.getElementById('donModalOv').classList.remove('open')">✕</button>
+      </div>
+      <div style="padding:20px">
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px">Choisir un montant</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px" id="don-grid">
+          <div onclick="donSel(5,this)" style="border:2px solid #e2e8f0;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;background:#fff;transition:all .18s"><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:#00204A">5€</div><div style="font-size:.65rem;color:#64748b">Coup de pouce</div></div>
+          <div onclick="donSel(10,this)" style="border:2px solid #e2e8f0;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;background:#fff;transition:all .18s"><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:#00204A">10€</div><div style="font-size:.65rem;color:#64748b">Soutien</div></div>
+          <div onclick="donSel(20,this)" style="border:2px solid #e67e22;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;background:#fff8f0;transition:all .18s"><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:#00204A">20€</div><div style="font-size:.65rem;color:#64748b">Engagement</div></div>
+          <div onclick="donSel(50,this)" style="border:2px solid #e2e8f0;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;background:#fff;transition:all .18s"><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.1rem;color:#00204A">50€</div><div style="font-size:.65rem;color:#64748b">Mécène</div></div>
+        </div>
+        <input type="number" id="don-autre" placeholder="Autre montant (€)" min="1" oninput="donAutre(this)" style="width:100%;border:1.8px solid #e2e8f0;border-radius:10px;padding:9px 12px;font-size:.9rem;font-family:inherit;outline:none;margin-bottom:14px">
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px">Vos informations</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input type="text" id="don-nom" placeholder="Nom *" style="border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:.87rem;font-family:inherit;outline:none;background:#f8fafc">
+          <input type="text" id="don-prenom" placeholder="Prénom *" style="border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:.87rem;font-family:inherit;outline:none;background:#f8fafc">
+        </div>
+        <input type="email" id="don-email" placeholder="Email *" style="width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:.87rem;font-family:inherit;outline:none;background:#f8fafc;margin-bottom:14px">
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px">Modalités de paiement</p>
+        <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:11px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.85rem">Wero</div><div style="font-size:.78rem;color:#0f172a">Issa GUEYE</div></div>
+          <div style="font-weight:800;color:#00204A;font-size:.85rem">+33 6 67 16 21 87</div>
+        </div>
+        <div style="background:#fdf4dd;border:1.5px solid #b07d0a;border-radius:11px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px">
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#b07d0a;font-size:.85rem">PayPal</div><div style="font-size:.7rem;color:#64748b;font-style:italic">Paiement entre amis</div></div>
+          <div style="font-weight:700;font-size:.82rem;color:#0f172a"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="345341514d515d474755745359555d581a575b59">[email&#160;protected]</a></div>
+        </div>
+        <div style="background:#e8f5ee;border:1.5px solid #00853F;border-radius:11px;padding:11px 14px;margin-bottom:14px">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00853F;font-size:.85rem;margin-bottom:4px">Revolut — Virement IBAN</div>
+          <div style="font-family:'Courier New',monospace;font-weight:700;font-size:.8rem;color:#00204A">FR76 2823 3000 0159 7419 9529 132</div>
+          <div style="font-size:.68rem;color:#64748b;font-style:italic;margin-top:2px">Indiquer votre nom en référence</div>
+        </div>
+        <button id="btnDonSubmit" onclick="submitDon()" style="width:100%;padding:12px;background:linear-gradient(135deg,#e67e22,#d35400);color:#fff;border:none;border-radius:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px">
+          💛 Enregistrer mon don de <span id="don-lbl">20€</span>
+        </button>
+        <p style="font-size:.7rem;color:#94a3b8;text-align:center;margin:8px 0 0;line-height:1.5">Effectuez le paiement via l'une des méthodes ci-dessus après enregistrement.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENU ORIGINAL DU BASE (inchangé) ══ -->
+
+  <!-- Bouton Rejoignez-nous fixe (remplacé par navbar) -->
   <button class="btn-join-fixed" onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'})">🧭 Rejoignez-nous</button>
 
   <!-- Bouton Admin (déplacé en bas) -->
@@ -452,8 +669,334 @@ if('serviceWorker' in navigator){
         <span class="chip pdf">📄 Découvrir l'AKF</span>
         <span>En savoir plus</span>
       </a>
+      <a class="tab tab-carte-membre" href="#" onclick="openCarteMembre(event)" rel="noopener">
+        <span class="chip carte">🪪 Carte membre</span>
+        <span>J'achète ma carte</span>
+      </a>
     </div>
   </section>
+
+  <!-- MODAL CARTE MEMBRE -->
+  <div class="carte-modal-ov" id="carteMembreOv">
+    <div class="carte-modal-box">
+      <div class="carte-modal-header">
+        <h3 id="cmModalTitle">🪪 J'achète ma Carte de Membre AKF</h3>
+        <button class="carte-modal-close" onclick="document.getElementById('carteMembreOv').classList.remove('open')">✕</button>
+      </div>
+
+      <!-- ══ ÉTAPE 1 : CHOIX DU TYPE DE CARTE ══ -->
+      <div id="cmStep1" class="carte-type-step">
+        <h4>Choisissez votre type de carte</h4>
+        <p>Sélectionnez la formule qui correspond à votre engagement</p>
+
+        <div class="carte-type-grid">
+          <!-- Bronze -->
+          <div class="carte-type-card bronze" onclick="cmSelectType('bronze')" id="cmCard_bronze">
+            <div class="carte-type-check">✓</div>
+            <svg class="carte-type-badge-img" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bronzeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#D4955A"/>
+                  <stop offset="50%" style="stop-color:#CD7F32"/>
+                  <stop offset="100%" style="stop-color:#8B5E3C"/>
+                </linearGradient>
+                <linearGradient id="bronzeShine" x1="0%" y1="0%" x2="60%" y2="100%">
+                  <stop offset="0%" style="stop-color:#E8A96A;stop-opacity:1"/>
+                  <stop offset="100%" style="stop-color:#CD7F32;stop-opacity:1"/>
+                </linearGradient>
+              </defs>
+              <!-- Bouclier principal -->
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#bronzeGrad)"/>
+              <!-- Reflet gauche -->
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#bronzeShine)" opacity="0.35"/>
+              <!-- Bordure intérieure -->
+              <path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+              <!-- Ligne centrale -->
+              <line x1="100" y1="8" x2="100" y2="125" stroke="rgba(0,0,0,0.15)" stroke-width="3"/>
+              <!-- Texte BRONZE -->
+              <text x="100" y="108" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="white" text-anchor="middle" letter-spacing="2">BRONZE</text>
+              <text x="100" y="130" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="3">MEMBER</text>
+              <!-- Laurier gauche -->
+              <g transform="translate(38,145)" fill="rgba(255,255,255,0.6)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(-30,0,12)"/>
+                <ellipse cx="8" cy="5" rx="7" ry="11" transform="rotate(-15,8,5)"/>
+                <ellipse cx="16" cy="0" rx="7" ry="11" transform="rotate(0,16,0)"/>
+              </g>
+              <!-- Laurier droit -->
+              <g transform="translate(162,145)" fill="rgba(255,255,255,0.6)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(30,0,12)"/>
+                <ellipse cx="-8" cy="5" rx="7" ry="11" transform="rotate(15,-8,5)"/>
+                <ellipse cx="-16" cy="0" rx="7" ry="11" transform="rotate(0,-16,0)"/>
+              </g>
+            </svg>
+            <div class="carte-type-name">Bronze</div>
+            <div class="carte-type-price">10 €</div>
+          </div>
+
+          <!-- Argent -->
+          <div class="carte-type-card silver" onclick="cmSelectType('silver')" id="cmCard_silver">
+            <div class="carte-type-check">✓</div>
+            <svg class="carte-type-badge-img" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#C8D0D8"/>
+                  <stop offset="50%" style="stop-color:#9EA9B0"/>
+                  <stop offset="100%" style="stop-color:#6E7E8A"/>
+                </linearGradient>
+                <linearGradient id="silverShine" x1="0%" y1="0%" x2="60%" y2="100%">
+                  <stop offset="0%" style="stop-color:#E8EDF0;stop-opacity:1"/>
+                  <stop offset="100%" style="stop-color:#9EA9B0;stop-opacity:1"/>
+                </linearGradient>
+              </defs>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#silverGrad)"/>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#silverShine)" opacity="0.4"/>
+              <path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              <line x1="100" y1="8" x2="100" y2="125" stroke="rgba(0,0,0,0.12)" stroke-width="3"/>
+              <text x="100" y="108" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="white" text-anchor="middle" letter-spacing="2">SILVER</text>
+              <text x="100" y="130" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="3">MEMBER</text>
+              <g transform="translate(38,145)" fill="rgba(255,255,255,0.65)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(-30,0,12)"/>
+                <ellipse cx="8" cy="5" rx="7" ry="11" transform="rotate(-15,8,5)"/>
+                <ellipse cx="16" cy="0" rx="7" ry="11" transform="rotate(0,16,0)"/>
+              </g>
+              <g transform="translate(162,145)" fill="rgba(255,255,255,0.65)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(30,0,12)"/>
+                <ellipse cx="-8" cy="5" rx="7" ry="11" transform="rotate(15,-8,5)"/>
+                <ellipse cx="-16" cy="0" rx="7" ry="11" transform="rotate(0,-16,0)"/>
+              </g>
+            </svg>
+            <div class="carte-type-name">Argent</div>
+            <div class="carte-type-price">25 €</div>
+          </div>
+
+          <!-- Gold -->
+          <div class="carte-type-card gold" onclick="cmSelectType('gold')" id="cmCard_gold">
+            <div class="carte-type-check">✓</div>
+            <svg class="carte-type-badge-img" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#F0C040"/>
+                  <stop offset="50%" style="stop-color:#D4AF37"/>
+                  <stop offset="100%" style="stop-color:#9A7B20"/>
+                </linearGradient>
+                <linearGradient id="goldShine" x1="0%" y1="0%" x2="60%" y2="100%">
+                  <stop offset="0%" style="stop-color:#FFE066;stop-opacity:1"/>
+                  <stop offset="100%" style="stop-color:#D4AF37;stop-opacity:1"/>
+                </linearGradient>
+              </defs>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#goldGrad)"/>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#goldShine)" opacity="0.38"/>
+              <path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+              <line x1="100" y1="8" x2="100" y2="125" stroke="rgba(0,0,0,0.12)" stroke-width="3"/>
+              <!-- Étoiles -->
+              <polygon points="80,48 83,58 93,58 85,64 88,74 80,68 72,74 75,64 67,58 77,58" fill="rgba(255,255,255,0.9)"/>
+              <polygon points="100,44 103,54 113,54 105,60 108,70 100,64 92,70 95,60 87,54 97,54" fill="rgba(255,255,255,0.9)"/>
+              <polygon points="120,48 123,58 133,58 125,64 128,74 120,68 112,74 115,64 107,58 117,58" fill="rgba(255,255,255,0.9)"/>
+              <text x="100" y="108" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="white" text-anchor="middle" letter-spacing="2">GOLD</text>
+              <text x="100" y="130" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="3">MEMBER</text>
+              <g transform="translate(38,145)" fill="rgba(255,255,255,0.7)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(-30,0,12)"/>
+                <ellipse cx="8" cy="5" rx="7" ry="11" transform="rotate(-15,8,5)"/>
+                <ellipse cx="16" cy="0" rx="7" ry="11" transform="rotate(0,16,0)"/>
+              </g>
+              <g transform="translate(162,145)" fill="rgba(255,255,255,0.7)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(30,0,12)"/>
+                <ellipse cx="-8" cy="5" rx="7" ry="11" transform="rotate(15,-8,5)"/>
+                <ellipse cx="-16" cy="0" rx="7" ry="11" transform="rotate(0,-16,0)"/>
+              </g>
+            </svg>
+            <div class="carte-type-name">Gold</div>
+            <div class="carte-type-price">50 €</div>
+          </div>
+
+          <!-- Platine -->
+          <div class="carte-type-card platinum" onclick="cmSelectType('platinum')" id="cmCard_platinum">
+            <div class="carte-type-check">✓</div>
+            <svg class="carte-type-badge-img" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="platGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#2563eb"/>
+                  <stop offset="50%" style="stop-color:#1E40AF"/>
+                  <stop offset="100%" style="stop-color:#1e3a8a"/>
+                </linearGradient>
+                <linearGradient id="platShine" x1="0%" y1="0%" x2="60%" y2="100%">
+                  <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1"/>
+                  <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1"/>
+                </linearGradient>
+              </defs>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#platGrad)"/>
+              <path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#platShine)" opacity="0.35"/>
+              <path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              <line x1="100" y1="8" x2="100" y2="125" stroke="rgba(0,0,0,0.12)" stroke-width="3"/>
+              <!-- Diamant -->
+              <polygon points="100,35 118,52 100,72 82,52" fill="rgba(255,255,255,0.9)"/>
+              <polygon points="100,35 118,52 100,52" fill="rgba(255,255,255,0.6)"/>
+              <!-- Étoiles petites -->
+              <circle cx="72" cy="50" r="3" fill="rgba(255,255,255,0.7)"/>
+              <circle cx="128" cy="50" r="3" fill="rgba(255,255,255,0.7)"/>
+              <circle cx="100" cy="30" r="2" fill="rgba(255,255,255,0.6)"/>
+              <text x="100" y="108" font-family="Arial Black,sans-serif" font-size="17" font-weight="900" fill="white" text-anchor="middle" letter-spacing="1">PLATINUM</text>
+              <text x="100" y="130" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="3">MEMBER</text>
+              <g transform="translate(38,145)" fill="rgba(255,255,255,0.65)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(-30,0,12)"/>
+                <ellipse cx="8" cy="5" rx="7" ry="11" transform="rotate(-15,8,5)"/>
+                <ellipse cx="16" cy="0" rx="7" ry="11" transform="rotate(0,16,0)"/>
+              </g>
+              <g transform="translate(162,145)" fill="rgba(255,255,255,0.65)">
+                <ellipse cx="0" cy="12" rx="7" ry="11" transform="rotate(30,0,12)"/>
+                <ellipse cx="-8" cy="5" rx="7" ry="11" transform="rotate(15,-8,5)"/>
+                <ellipse cx="-16" cy="0" rx="7" ry="11" transform="rotate(0,-16,0)"/>
+              </g>
+            </svg>
+            <div class="carte-type-name">Platine</div>
+            <div class="carte-type-price">100 €</div>
+          </div>
+        </div>
+
+        <button class="carte-type-cta" id="cmBtnNext" onclick="cmGoToForm()" disabled>
+          <span>Continuer</span> <span>→</span>
+        </button>
+      </div>
+
+      <!-- ══ ÉTAPE 2 : FORMULAIRE ══ -->
+      <div id="cmStep2" style="display:none">
+        <div class="carte-modal-body">
+          <!-- Bandeau type sélectionné -->
+          <div id="cmTypeBandeau" style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 14px;margin-bottom:14px;cursor:pointer" onclick="cmBackToStep1()">
+            <span style="font-size:.75rem;color:#64748b">← Modifier</span>
+            <div id="cmBandeauBadge" style="flex-shrink:0"></div>
+            <div>
+              <div id="cmBandeauNom" style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.88rem;color:#00204A"></div>
+              <div id="cmBandeauPrix" style="font-size:.78rem;color:#64748b;font-weight:600"></div>
+            </div>
+          </div>
+
+          <p style="color:#64748b;font-size:.88rem;margin:0 0 14px">Remplissez le formulaire. Votre carte sera générée et les informations de paiement vous seront envoyées par email.</p>
+
+          <!-- Photo upload -->
+          <div class="photo-upload-zone" id="cmPhotoZone" onclick="document.getElementById('cmPhotoInput').click()">
+            <img id="cmPhotoPreview" src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg"
+              style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:block;border:3px solid #00204A" alt="Photo">
+            <p id="cmPhotoLabel">📷 Cliquez pour ajouter votre photo</p>
+          </div>
+          <input type="file" id="cmPhotoInput" accept="image/*" style="display:none" onchange="cmHandlePhoto(event)">
+
+          <!-- Champs -->
+          <div class="row two" style="margin-top:12px">
+            <div><label>Prénom *</label><input id="cm_prenom" placeholder="Ibrahima" oninput="cmUpdatePreview()"></div>
+            <div><label>Nom *</label><input id="cm_nom" placeholder="SYLL" oninput="cmUpdatePreview()"></div>
+          </div>
+          <div class="row two" style="margin-top:10px">
+            <div><label>Email *</label><input id="cm_email" type="email" placeholder="exemple@email.com"></div>
+            <div><label>Téléphone *</label><input id="cm_tel" placeholder="06…"></div>
+          </div>
+          <div style="margin-top:10px">
+            <label>Fonction / Spécialité *</label>
+            <input id="cm_fonction" placeholder="Juriste, Médecin, Étudiant…" oninput="cmUpdatePreview()">
+          </div>
+
+          <!-- Aperçu carte -->
+          <div style="margin-top:18px">
+            <p style="font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin:0 0 8px">Aperçu de votre carte</p>
+            <div class="carte-preview" id="cmCartePreview">
+              <div class="carte-flag"><div class="f1"></div><div class="f2"></div><div class="f3"></div></div>
+              <div class="carte-inner">
+                <div class="carte-header-row">
+                  <div class="carte-title-block">
+                    <h4>Carte de Membre</h4>
+                    <span class="carte-badge">Officielle</span>
+                  </div>
+                  <!-- Badge type membre à droite du logo -->
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                    <img src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg" alt="Logo AKF" class="carte-logo" crossorigin="anonymous">
+                    <div id="cmCarteBadgeZone" style="margin-top:2px"></div>
+                  </div>
+                </div>
+                <div class="carte-body-row">
+                  <img id="cmCartePhoto" src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg" alt="Photo" class="carte-photo" crossorigin="anonymous">
+                  <div class="carte-info">
+                    <div class="carte-nom" id="cmCarteNom">PRÉNOM NOM</div>
+                    <div class="carte-fonction" id="cmCarteFonction">Fonction</div>
+                    <div class="carte-details">
+                      <div class="carte-detail-row">
+                        <span class="carte-detail-label">Matricule</span>
+                        <span class="carte-detail-val" id="cmCarteMatricule">AKF-2026-2027-?????</span>
+                      </div>
+                      <div class="carte-detail-row">
+                        <span class="carte-detail-label">Validité</span>
+                        <span class="carte-detail-val green">2026 – 2027</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="carte-sigs">
+                  <div class="carte-sig"><div class="carte-sig-line"></div><p class="carte-sig-label">Le Président</p></div>
+                  <div class="carte-sig"><div class="carte-sig-line"></div><p class="carte-sig-label">Le Secrétaire<br>Général</p></div>
+                  <div class="carte-sig"><div class="carte-sig-line"></div><p class="carte-sig-label">Le Trésorier</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton -->
+          <button class="pub-btn" id="btnCarteSubmit" type="button" onclick="cmSoumettre()" style="width:100%;margin-top:18px;font-size:1rem;background:linear-gradient(135deg,#00204A,#1E40AF)">
+            🪪 Générer ma carte &amp; recevoir les infos de paiement
+          </button>
+          <p id="cmPrixLabel" style="font-size:.78rem;color:#94a3b8;text-align:center;margin-top:8px">Carte officielle — Frais de traitement : <strong style="color:#00204A">10€</strong></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VERSO CARTE (caché, utilisé pour génération image) -->
+  <div id="cmCarteVerso" style="position:fixed;left:-9999px;top:-9999px;width:600px;background:#fff;border-radius:0;overflow:hidden;font-family:'Montserrat',sans-serif">
+    <!-- Bandeau drapeau -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:8px">
+      <div style="background:#00853F"></div>
+      <div style="background:#FDEF42"></div>
+      <div style="background:#E31B23"></div>
+    </div>
+    <!-- Corps verso -->
+    <div style="background:linear-gradient(135deg,#00204A 0%,#1E40AF 100%);padding:28px 32px;min-height:220px;display:flex;gap:28px;align-items:center">
+      <!-- QR Code -->
+      <div style="background:#fff;border-radius:12px;padding:12px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px">
+        <canvas id="cmQrCanvas" width="140" height="140"></canvas>
+        <span style="font-size:9px;font-weight:800;color:#00204A;letter-spacing:.06em;text-transform:uppercase">Vérification</span>
+      </div>
+      <!-- Infos -->
+      <div style="flex:1;color:#fff">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">Association des Kébémerois de France</div>
+        <div id="verso_nom" style="font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;line-height:1.2;margin-bottom:6px">PRÉNOM NOM</div>
+        <div id="verso_fonction" style="font-size:13px;font-weight:700;color:#FDEF42;margin-bottom:14px">Fonction</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px 10px">
+            <div style="font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Matricule</div>
+            <div id="verso_matricule" style="font-size:11px;font-weight:700;color:#fff">AKF-2026-2027-?????</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px 10px">
+            <div style="font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Validité</div>
+            <div style="font-size:11px;font-weight:700;color:#00853F">2026 – 2027</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px 10px">
+            <div style="font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Téléphone</div>
+            <div id="verso_tel" style="font-size:11px;font-weight:700;color:#fff">—</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px 10px">
+            <div style="font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Email</div>
+            <div id="verso_email" style="font-size:9px;font-weight:700;color:#fff;word-break:break-all">—</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:8px;color:rgba(255,255,255,.4);font-style:italic">En cas de perte, contactez : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="badbc9c9d5d1dfd8dfdcc8dbd4d9dffaddd7dbd3d694d9d5d7">[email&#160;protected]</a></div>
+      </div>
+    </div>
+    <!-- Bandeau drapeau bas -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:8px">
+      <div style="background:#00853F"></div>
+      <div style="background:#FDEF42"></div>
+      <div style="background:#E31B23"></div>
+    </div>
+  </div>
 
   <!-- MODAL PDF VIEWER -->
   <div class="pdf-modal-ov" id="pdf-modal-ov" onclick="closePDFModal(event)">
@@ -466,7 +1009,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function openPDF(e){
     e.preventDefault();
     const pdfUrl = 'https://raw.githubusercontent.com/mamadouba1/akf/main/Pr%C3%A9sentation_AKF.pdf';
@@ -486,7 +1029,456 @@ if('serviceWorker' in navigator){
       document.getElementById('pdf-frame').src = '';
     }
   });
+
+  // ══ CARTE MEMBRE JS ══
+
+  // ── Données des types de carte ──
+  const CM_TYPES = {
+    bronze:   { nom:'Bronze',  prix:10,  emoji:'🥉', color:'#CD7F32' },
+    silver:   { nom:'Argent',  prix:25,  emoji:'🥈', color:'#9EA9B0' },
+    gold:     { nom:'Gold',    prix:50,  emoji:'🥇', color:'#D4AF37' },
+    platinum: { nom:'Platine', prix:100, emoji:'💎', color:'#1E40AF' }
+  };
+  let cmSelectedType = null;
+
+  // SVG badge inline pour la carte preview (petit)
+  function cmBadgeSVG(type){
+    const svgs = {
+      bronze: `<svg viewBox="0 0 200 220" width="38" height="42" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#D4955A"/><stop offset="50%" style="stop-color:#CD7F32"/><stop offset="100%" style="stop-color:#8B5E3C"/></linearGradient></defs><path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#pb)"/><path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/><text x="100" y="115" font-family="Arial Black,sans-serif" font-size="28" font-weight="900" fill="white" text-anchor="middle">B</text></svg>`,
+      silver: `<svg viewBox="0 0 200 220" width="38" height="42" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ps" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#C8D0D8"/><stop offset="50%" style="stop-color:#9EA9B0"/><stop offset="100%" style="stop-color:#6E7E8A"/></linearGradient></defs><path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#ps)"/><path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/><text x="100" y="115" font-family="Arial Black,sans-serif" font-size="28" font-weight="900" fill="white" text-anchor="middle">A</text></svg>`,
+      gold:   `<svg viewBox="0 0 200 220" width="38" height="42" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#F0C040"/><stop offset="50%" style="stop-color:#D4AF37"/><stop offset="100%" style="stop-color:#9A7B20"/></linearGradient></defs><path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#pg)"/><path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/><text x="100" y="115" font-family="Arial Black,sans-serif" font-size="28" font-weight="900" fill="white" text-anchor="middle">G</text></svg>`,
+      platinum:`<svg viewBox="0 0 200 220" width="38" height="42" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pp" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2563eb"/><stop offset="50%" style="stop-color:#1E40AF"/><stop offset="100%" style="stop-color:#1e3a8a"/></linearGradient></defs><path d="M100,8 L185,45 L185,120 Q185,175 100,210 Q15,175 15,120 L15,45 Z" fill="url(#pp)"/><path d="M100,22 L172,55 L172,118 Q172,165 100,197 Q28,165 28,118 L28,55 Z" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/><polygon points="100,55 112,80 100,90 88,80" fill="rgba(255,255,255,0.9)"/><text x="100" y="115" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">PLT</text></svg>`
+    };
+    return svgs[type] || '';
+  }
+
+  function cmSelectType(type){
+    cmSelectedType = type;
+    // Mettre à jour les cartes visuellement
+    Object.keys(CM_TYPES).forEach(k => {
+      const card = document.getElementById('cmCard_'+k);
+      if(card) card.classList.toggle('selected', k === type);
+    });
+    // Activer le bouton
+    document.getElementById('cmBtnNext').disabled = false;
+    document.getElementById('cmBtnNext').innerHTML = `<span>Continuer avec la carte ${CM_TYPES[type].nom}</span> <span>→</span>`;
+  }
+
+  function cmGoToForm(){
+    if(!cmSelectedType) return;
+    const t = CM_TYPES[cmSelectedType];
+    // Afficher le bandeau récap
+    document.getElementById('cmBandeauBadge').innerHTML = cmBadgeSVG(cmSelectedType);
+    document.getElementById('cmBandeauNom').textContent = `Carte ${t.nom}`;
+    document.getElementById('cmBandeauPrix').textContent = `${t.prix} € — Carte officielle AKF`;
+    document.getElementById('cmPrixLabel').innerHTML = `Carte officielle — Frais de traitement : <strong style="color:${t.color}">${t.prix}€</strong> (${t.nom})`;
+    // Badge dans la preview carte
+    document.getElementById('cmCarteBadgeZone').innerHTML = cmBadgeSVG(cmSelectedType);
+    // Changer les étapes
+    document.getElementById('cmStep1').style.display = 'none';
+    document.getElementById('cmStep2').style.display = 'block';
+    document.getElementById('cmModalTitle').textContent = `🪪 Carte ${t.nom} — J'achète ma Carte AKF`;
+  }
+
+  function cmBackToStep1(){
+    document.getElementById('cmStep1').style.display = 'block';
+    document.getElementById('cmStep2').style.display = 'none';
+    document.getElementById('cmModalTitle').textContent = `🪪 J'achète ma Carte de Membre AKF`;
+  }
+
+  function openCarteMembre(e){
+    e.preventDefault();
+    // Reset étape 1
+    cmSelectedType = null;
+    document.getElementById('cmStep1').style.display = 'block';
+    document.getElementById('cmStep2').style.display = 'none';
+    document.getElementById('cmModalTitle').textContent = `🪪 J'achète ma Carte de Membre AKF`;
+    document.getElementById('cmBtnNext').disabled = true;
+    document.getElementById('cmBtnNext').innerHTML = `<span>Continuer</span> <span>→</span>`;
+    Object.keys(CM_TYPES).forEach(k => {
+      const card = document.getElementById('cmCard_'+k);
+      if(card) card.classList.remove('selected');
+    });
+    document.getElementById('carteMembreOv').classList.add('open');
+  }
+
+  let cmPhotoDataUrl = null;
+
+  function cmHandlePhoto(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      cmPhotoDataUrl = ev.target.result;
+      document.getElementById('cmPhotoPreview').src = cmPhotoDataUrl;
+      document.getElementById('cmCartePhoto').src = cmPhotoDataUrl;
+      document.getElementById('cmPhotoLabel').textContent = '✅ Photo ajoutée';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function cmUpdatePreview(){
+    const prenom = document.getElementById('cm_prenom').value.trim() || 'PRÉNOM';
+    const nom = document.getElementById('cm_nom').value.trim() || 'NOM';
+    const fonction = document.getElementById('cm_fonction').value.trim() || 'Fonction';
+    document.getElementById('cmCarteNom').textContent = (prenom + ' ' + nom).toUpperCase();
+    document.getElementById('cmCarteFonction').textContent = fonction;
+  }
+
+  function cmGenMatricule(){
+    const n = Math.floor(10000 + Math.random() * 90000);
+    return 'AKF-2026-2027-' + n;
+  }
+
+  // Génère le QR code et remplit le verso
+  async function cmPrepareVerso(prenom, nom, email, tel, fonction, matricule){
+    document.getElementById('verso_nom').textContent = (prenom + ' ' + nom).toUpperCase();
+    document.getElementById('verso_fonction').textContent = fonction;
+    document.getElementById('verso_matricule').textContent = matricule;
+    document.getElementById('verso_tel').textContent = tel;
+    document.getElementById('verso_email').textContent = email;
+
+    const qrData = `Nom: ${prenom} ${nom}\nMatricule: ${matricule}\nFonction: ${fonction}\nEmail: ${email}\nTel: ${tel}\nValidité: 2026-2027\nAKF - assokebefrance@gmail.com`;
+    await QRCode.toCanvas(document.getElementById('cmQrCanvas'), qrData, {
+      width: 140, margin: 1,
+      color: { dark: '#00204A', light: '#ffffff' }
+    });
+  }
+
+  // Capture un élément HTML en PNG base64
+  async function cmCapture(el){
+    const canvas = await html2canvas(el, {
+      scale: 3, useCORS: true, allowTaint: true,
+      backgroundColor: '#ffffff', logging: false
+    });
+    return canvas.toDataURL('image/png', 1.0);
+  }
+
+  // Construit un PDF recto+verso et retourne en base64 (sans préfixe data:)
+  async function cmBuildPDF(rectoB64, versoB64){
+    const { jsPDF } = window.jspdf;
+    // Dimensions CR80 carte en mm : 85.6 x 54
+    const W = 85.6, H = 54;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] });
+    pdf.addImage(rectoB64, 'PNG', 0, 0, W, H);
+    pdf.addPage([W, H], 'landscape');
+    pdf.addImage(versoB64, 'PNG', 0, 0, W, H);
+    return pdf.output('datauristring').split(',')[1]; // base64 pur
+  }
+
+  // Compresse canvas en JPEG base64 sous maxKb
+  async function cmCompressImage(dataUrl, maxKb = 30) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale  = Math.min(1, 900 / img.width);
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        let result = dataUrl;
+        for(let q = 0.82; q >= 0.25; q -= 0.08){
+          result = canvas.toDataURL('image/jpeg', q);
+          if((result.length * 3 / 4 / 1024) <= maxKb) break;
+        }
+        resolve(result);
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  // Crée un ZIP contenant recto.jpg + verso.jpg + carte.pdf et retourne le base64 pur
+  async function cmBuildZip(rectoB64, versoB64, pdfB64){
+    const zip = new JSZip();
+    // Extraire les données binaires (retirer le préfixe data:...)
+    zip.file('carte_recto.jpg', rectoB64.split(',')[1], {base64: true});
+    zip.file('carte_verso_qr.jpg', versoB64.split(',')[1], {base64: true});
+    zip.file('carte_membre.pdf',   pdfB64,                {base64: true});
+    const blob = await zip.generateAsync({type:'base64', compression:'DEFLATE', compressionOptions:{level:6}});
+    return blob; // base64 pur
+  }
+
+  // PDF paiement propre - sans emoji, texte lisible
+  async function cmBuildPaiementPDF(prenom, nom, matricule, typeCarte, prixCarte){
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210;
+
+    // Bandeau tricolore haut
+    pdf.setFillColor(0,133,63);   pdf.rect(0,   0, W/3, 7, 'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3, 0, W/3, 7, 'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3, 0, W/3, 7, 'F');
+
+    // En-tete bleu marine
+    pdf.setFillColor(0,32,74);
+    pdf.rect(0, 7, W, 38, 'F');
+
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(22);
+    pdf.setTextColor(255,255,255);
+    pdf.text('AKF', 16, 26);
+    pdf.setFontSize(8);
+    pdf.setFont('helvetica','normal');
+    pdf.setTextColor(160,190,230);
+    pdf.text('Association des Kebemerois de France', 16, 33);
+
+    pdf.setFontSize(13);
+    pdf.setFont('helvetica','bold');
+    pdf.setTextColor(255,255,255);
+    pdf.text('INSTRUCTIONS DE PAIEMENT', W/2, 24, {align:'center'});
+    pdf.setFontSize(8);
+    pdf.setFont('helvetica','normal');
+    pdf.setTextColor(160,190,230);
+    pdf.text('Carte de Membre ' + typeCarte + ' - Saison 2026-2027', W/2, 33, {align:'center'});
+
+    // Bloc confirmation vert
+    pdf.setFillColor(232,245,238);
+    pdf.setDrawColor(0,133,63);
+    pdf.setLineWidth(0.5);
+    pdf.rect(14, 55, W-28, 32, 'FD');
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(11);
+    pdf.setTextColor(0,100,50);
+    pdf.text('Votre carte membre a ete generee avec succes !', W/2, 66, {align:'center'});
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(15,23,42);
+    pdf.text('Bonjour ' + prenom + ' ' + nom + ',', W/2, 75, {align:'center'});
+    pdf.text('Votre matricule est : ' + matricule, W/2, 83, {align:'center'});
+
+    // Texte intro
+    pdf.setFontSize(10);
+    pdf.setTextColor(30,30,30);
+    pdf.text('Pour recevoir votre carte ' + typeCarte + ', merci de regler ' + prixCarte + ' euros aupres du tresorier', W/2, 100, {align:'center'});
+    pdf.text('en indiquant votre matricule comme reference.', W/2, 108, {align:'center'});
+
+    // Titre modalites
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(12);
+    pdf.setTextColor(0,32,74);
+    pdf.text('Modalites de paiement', W/2, 122, {align:'center'});
+    pdf.setDrawColor(180,195,220);
+    pdf.setLineWidth(0.4);
+    pdf.line(14, 126, W-14, 126);
+
+    // Bloc Wero
+    pdf.setFillColor(240,247,255);
+    pdf.setDrawColor(30,64,175);
+    pdf.setLineWidth(0.4);
+    pdf.rect(14, 130, W-28, 20, 'FD');
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(30,64,175);
+    pdf.text('Wero', 22, 140);
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(15,23,42);
+    pdf.text('Issa GUEYE', 22, 147);
+    pdf.setFont('helvetica','bold');
+    pdf.text('+33 6 67 16 21 87', W-22, 147, {align:'right'});
+
+    // Bloc PayPal
+    pdf.setFillColor(255,250,235);
+    pdf.setDrawColor(176,125,10);
+    pdf.rect(14, 155, W-28, 20, 'FD');
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(140,95,5);
+    pdf.text('PayPal', 22, 165);
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(15,23,42);
+    pdf.text('gueyeissa@gmail.com', W-22, 165, {align:'right'});
+    pdf.setFont('helvetica','italic');
+    pdf.setFontSize(8);
+    pdf.setTextColor(100,100,100);
+    pdf.text('Envoyer en tant que paiement a des amis', 22, 172);
+
+    // Bloc Revolut IBAN
+    pdf.setFillColor(240,252,246);
+    pdf.setDrawColor(0,133,63);
+    pdf.rect(14, 180, W-28, 26, 'FD');
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(0,100,50);
+    pdf.text('Revolut - Virement IBAN', 22, 190);
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(15,23,42);
+    pdf.text('IBAN :', 22, 199);
+    pdf.setFont('courier','bold');
+    pdf.setFontSize(9);
+    pdf.text('FR76 2823 3000 0159 7419 9529 132', 40, 199);
+    pdf.setFont('helvetica','italic');
+    pdf.setFontSize(8);
+    pdf.setTextColor(100,100,100);
+    pdf.text('Indiquer votre matricule en reference du virement', 22, 204);
+
+    // Rappel matricule fond bleu
+    pdf.setFillColor(0,32,74);
+    pdf.rect(14, 214, W-28, 22, 'F');
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(255,255,255);
+    pdf.text('RAPPEL : indiquez toujours votre matricule lors du paiement', W/2, 223, {align:'center'});
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(13);
+    pdf.setTextColor(253,239,66);
+    pdf.text(matricule, W/2, 232, {align:'center'});
+
+    // Message final
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(30,30,30);
+    pdf.text("L'equipe AKF vous remercie de votre engagement et de votre confiance.", W/2, 250, {align:'center'});
+    pdf.setFont('helvetica','bold');
+    pdf.text("Cordialement, L'equipe AKF !!!", W/2, 258, {align:'center'});
+
+    // Separateur
+    pdf.setDrawColor(200,210,230);
+    pdf.setLineWidth(0.3);
+    pdf.line(14, 264, W-14, 264);
+
+    // Footer
+    pdf.setFont('helvetica','normal');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(150,150,160);
+    pdf.text('assokebefrance@gmail.com', W/2, 270, {align:'center'});
+    pdf.text('Association des Kebemerois de France - Kebemer, Senegal & France', W/2, 276, {align:'center'});
+
+    // Bandeau tricolore bas
+    pdf.setFillColor(0,133,63);   pdf.rect(0,   290, W/3, 7, 'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3, 290, W/3, 7, 'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3, 290, W/3, 7, 'F');
+
+    return pdf.output('datauristring').split(',')[1];
+  }
+
+  async function cmSoumettre(){
+    const prenom   = document.getElementById('cm_prenom').value.trim();
+    const nom      = document.getElementById('cm_nom').value.trim();
+    const email    = document.getElementById('cm_email').value.trim();
+    const tel      = document.getElementById('cm_tel').value.trim();
+    const fonction = document.getElementById('cm_fonction').value.trim();
+
+    if(!prenom || !nom || !email || !tel || !fonction){
+      alert('Veuillez remplir tous les champs obligatoires (*)');
+      return;
+    }
+    if(!/\S+@\S+\.\S+/.test(email)){
+      alert('Veuillez entrer un email valide.');
+      return;
+    }
+
+    const btn = document.getElementById('btnCarteSubmit');
+    btn.disabled = true;
+
+    const matricule = cmGenMatricule();
+    document.getElementById('cmCarteMatricule').textContent = matricule;
+
+    const typeCarte = cmSelectedType ? CM_TYPES[cmSelectedType].nom : 'Standard';
+    const prixCarte = cmSelectedType ? CM_TYPES[cmSelectedType].prix : 10;
+
+    // ── Enregistrement initial dans Supabase ──
+    const { error: sbError } = await _sbPub.from('cartes_membres').insert([{
+      nom:             nom,
+      prenom:          prenom,
+      email:           email,
+      telephone:       tel,
+      fonction:        fonction,
+      matricule:       matricule,
+      type_carte:      cmSelectedType,
+      montant:         prixCarte,
+      statut_paiement: 'en_attente',
+      lien_wero:       'https://start.wero-wallet.eu/?wero-uc=share&wero-url=https%3A%2F%2Fshare.weropay.eu%2Fp%2F1%2Fc%2FY6hk4cGXwY'
+    }]);
+    if(sbError) console.warn('Supabase carte membre:', sbError.message);
+
+    try {
+      // 1. Capture recto HQ
+      btn.textContent = 'Generation de la carte...';
+      const rectoHQ = await cmCapture(document.getElementById('cmCartePreview'));
+
+      // 2. PDF recto carte format CR80
+      btn.textContent = 'PDF carte...';
+      const { jsPDF } = window.jspdf;
+      const Wc = 85.6, Hc = 54;
+      const pdfCarte = new jsPDF({ orientation:'landscape', unit:'mm', format:[Wc,Hc] });
+      pdfCarte.addImage(rectoHQ, 'PNG', 0, 0, Wc, Hc);
+      const pdfCarteB64 = pdfCarte.output('datauristring').split(',')[1];
+
+      // 3. PDF paiement
+      btn.textContent = 'PDF paiement...';
+      const pdfPaieB64 = await cmBuildPaiementPDF(prenom, nom, matricule, typeCarte, prixCarte);
+
+      // 4. Upload vers Supabase Storage (bucket privé "cartes")
+      btn.textContent = 'Envoi vers Supabase...';
+
+      function b64ToBlob(b64, type) {
+        const bytes = atob(b64);
+        const arr = new Uint8Array(bytes.length);
+        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+        return new Blob([arr], { type });
+      }
+
+      const folder = matricule;
+
+      const { error: e1 } = await _sbPub.storage.from('cartes')
+        .upload(`${folder}/carte.pdf`, b64ToBlob(pdfCarteB64, 'application/pdf'), { upsert: true });
+
+      const { error: e2 } = await _sbPub.storage.from('cartes')
+        .upload(`${folder}/paiement.pdf`, b64ToBlob(pdfPaieB64, 'application/pdf'), { upsert: true });
+
+      if(e1) console.warn('Upload carte.pdf :', e1.message);
+      if(e2) console.warn('Upload paiement.pdf :', e2.message);
+
+      // 5. Mettre à jour cartes_membres avec les chemins des fichiers
+      await _sbPub.from('cartes_membres').update({
+        url_carte_pdf:    e1 ? null : `${folder}/carte.pdf`,
+        url_paiement_pdf: e2 ? null : `${folder}/paiement.pdf`
+      }).eq('matricule', matricule);
+
+      btn.textContent = 'Carte generee !';
+      btn.style.background = '#00853F';
+
+      // 6. Ouvrir Wero après l'upload
+      setTimeout(() => {
+        window.open(
+          'https://start.wero-wallet.eu/?wero-uc=share&wero-url=https%3A%2F%2Fshare.weropay.eu%2Fp%2F1%2Fc%2FY6hk4cGXwY',
+          '_blank'
+        );
+      }, 800);
+
+      setTimeout(()=>{
+        btn.disabled = false;
+        btn.textContent = '\uD83E\uDEAA Generer ma carte & recevoir les infos de paiement';
+        btn.style.background = '';
+      }, 8000);
+
+      const body = document.querySelector('.carte-modal-body');
+      const msg  = document.createElement('div');
+      msg.style.cssText = 'background:#e8f5ee;border:1.5px solid #00853F;border-radius:12px;padding:18px;margin-top:14px;text-align:center';
+      msg.innerHTML =
+        '<p style="margin:0;font-weight:800;color:#00853F;font-size:1rem">Carte generee avec succes !</p>' +
+        '<p style="margin:8px 0 0;color:#065f46;font-size:.85rem;line-height:1.8">' +
+        'Matricule : <strong style="color:#00204A;font-size:.95rem">' + matricule + '</strong><br>' +
+        '<strong>PDFs sauvegardes dans Supabase :</strong><br>' +
+        '&bull; ' + (e1 ? '⚠️ carte.pdf (erreur upload)' : '✅ carte.pdf') + '<br>' +
+        '&bull; ' + (e2 ? '⚠️ paiement.pdf (erreur upload)' : '✅ paiement.pdf') + '<br><br>' +
+        '🔗 Lien Wero ouvert pour le paiement.' +
+        '</p>';
+      body.appendChild(msg);
+      setTimeout(()=>msg.remove(), 30000);
+
+    } catch(err){
+      console.error('Carte membre erreur:', err);
+      btn.disabled = false;
+      btn.textContent = '\uD83E\uDEAA Generer ma carte & recevoir les infos de paiement';
+      alert('Erreur : ' + (err.text || err.message || JSON.stringify(err)));
+    }
+  }
   </script>
+
 
   <!-- CONTENU PUBLIC -->
   <main class="section-pub">
@@ -505,6 +1497,36 @@ if('serviceWorker' in navigator){
 </li>
       </ul>
     </div>
+
+    <!-- ══ GRILLE DES 5 PILIERS ══ -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px">
+      <div style="background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:20px 18px;border-top:4px solid #00853F">
+        <div style="font-size:1.5rem;margin-bottom:8px">🤝</div>
+        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;color:#00204A;margin-bottom:6px">Entraide & Solidarité</div>
+        <div style="font-size:.82rem;color:#64748b;line-height:1.5">Un filet de sécurité sociale et administrative pour chaque membre face aux aléas de la vie en France.</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:20px 18px;border-top:4px solid #1E40AF">
+        <div style="font-size:1.5rem;margin-bottom:8px">🎓</div>
+        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;color:#00204A;margin-bottom:6px">Culture & Éducation</div>
+        <div style="font-size:.82rem;color:#64748b;line-height:1.5">Transmission intergénérationnelle, promotion de l'excellence scolaire et ateliers de savoir-faire.</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:20px 18px;border-top:4px solid #E31B23">
+        <div style="font-size:1.5rem;margin-bottom:8px">🌍</div>
+        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;color:#00204A;margin-bottom:6px">Développement de Kébémer</div>
+        <div style="font-size:.82rem;color:#64748b;line-height:1.5">Investissements dans les infrastructures de base (santé, eau, école) via des projets mutualisés.</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:20px 18px;border-top:4px solid #FDEF42;border-top-color:#d4b800">
+        <div style="font-size:1.5rem;margin-bottom:8px">🔗</div>
+        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;color:#00204A;margin-bottom:6px">Liens avec la Terre Natale</div>
+        <div style="font-size:.82rem;color:#64748b;line-height:1.5">Encourager les retours réguliers, les échanges d'expertise et prévenir la fracture diasporique.</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);padding:20px 18px;border-top:4px solid #7c3aed">
+        <div style="font-size:1.5rem;margin-bottom:8px">🏛️</div>
+        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;color:#00204A;margin-bottom:6px">Représentation en France</div>
+        <div style="font-size:.82rem;color:#64748b;line-height:1.5">Être l'interlocuteur juridique légitime auprès des institutions, mairies et bailleurs de fonds.</div>
+      </div>
+    </div>
+
     <div class="accordion">
       <!-- INSCRIPTION (maintenant en premier, avec id pour le scroll) -->
       <details id="details-inscription">
@@ -552,7 +1574,7 @@ if('serviceWorker' in navigator){
     </div>
     <!-- Bouton Admin en bas -->
     <div style="display:flex;justify-content:center;margin:28px 0 8px">
-      <button class="pub-btn alt" id="adminBtn" type="button" style="padding:10px 28px;font-size:.88rem;opacity:.55;filter:grayscale(.3)">🔒 Accès Admin</button>
+      <button class="pub-btn alt" id="adminBtn" type="button" style="padding:10px 28px;font-size:.88rem;opacity:.55;filter:grayscale(.3)">🔒 Tableau de bord</button>
     </div>
     <div class="footer-pub">© <span id="year"></span> AKF – Association des Kébémerois de France · Tous droits réservés</div>
   </main>
@@ -765,7 +1787,7 @@ if('serviceWorker' in navigator){
     <div class="toolbar">
       <div class="sw"><input type="search" id="ts" placeholder="Rechercher…" oninput="applyFT()"></div>
       <select class="flt" id="tfs" onchange="applyFT()"><option value="">Tous statuts</option><option>À faire</option><option>En cours</option><option>Terminée</option><option>Annulé</option><option>Abandonner</option></select>
-      <select class="flt" id="tfc" onchange="applyFT()"><option value="">Toutes commissions</option><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Commission Sociale et Educative</option><option>Relations extérieures</option><option>Organisation</option><option>Commissaires aux Comptes</option><option>Sages</option></select>
+      <select class="flt" id="tfc" onchange="applyFT()"><option value="">Toutes commissions</option><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Organisation</option><option>Social et éducatif</option><option>Relations extérieures</option></select>
       <select class="flt" id="tfp" onchange="applyFT()"><option value="">Toutes priorités</option><option>Haute</option><option>Moyenne</option><option>Basse</option></select>
       <span class="rc" id="rct">0 tâches</span>
     </div>
@@ -978,7 +2000,7 @@ if('serviceWorker' in navigator){
     <div class="fg">
       <div class="fr full"><label>Activité / Projet *</label><input id="at-activite" placeholder="Nom de la tâche"></div>
       <div class="fr"><label>Commission</label>
-        <select id="at-commission"><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Commission Sociale et Educative</option><option>Relations extérieures</option><option>Organisation</option><option>Commissaires aux Comptes</option><option>Sages</option></select>
+        <select id="at-commission"><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Organisation</option><option>Social et éducatif</option><option>Relations extérieures</option></select>
       </div>
       <div class="fr full"><label>Responsable(s)</label><input id="at-responsable" placeholder="Ex : Ibrahima et Fallou…"></div>
       <div class="fr"><label>Date début</label><input id="at-date_debut" type="date"></div>
@@ -1028,7 +2050,7 @@ if('serviceWorker' in navigator){
     <div class="fg">
       <div class="fr full"><label>Activité / Projet *</label><input id="et-activite"></div>
       <div class="fr"><label>Commission</label>
-        <select id="et-commission"><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Commission Sociale et Educative</option><option>Relations extérieures</option><option>Organisation</option><option>Commissaires aux Comptes</option><option>Sages</option></select>
+        <select id="et-commission"><option>Présidence</option><option>Secrétariat</option><option>Trésorerie</option><option>Communication</option><option>Organisation</option><option>Social et éducatif</option><option>Relations extérieures</option></select>
       </div>
       <div class="fr full"><label>Responsable(s)</label><input id="et-responsable"></div>
       <div class="fr"><label>Date début</label><input id="et-date_debut" type="date"></div>
@@ -1254,6 +2276,59 @@ document.getElementById('btnRegister').addEventListener('click',async()=>{
 });
 </script>
 
+<script>
+// ══ NAVBAR ════════════════════════════════════════════
+document.addEventListener('click', e => {
+  const m = document.getElementById('mobileMenu');
+  const b = document.getElementById('burgerBtn');
+  if(m && b && !m.contains(e.target) && !b.contains(e.target)) m.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    document.querySelectorAll('.don-modal-ov.open,.carte-modal-ov.open,.pdf-modal-ov.open,.ov-pub.open').forEach(o=>o.classList.remove('open'));
+    document.getElementById('mobileMenu')?.classList.remove('open');
+  }
+});
+
+// ══ MODALS RÉSEAUX + DON ══════════════════════════════
+function openReseauxModal(e){ if(e) e.preventDefault(); document.getElementById('reseauxModalOv').classList.add('open'); }
+function openDonModal(e){ if(e) e.preventDefault(); document.getElementById('donModalOv').classList.add('open'); }
+
+let _donMontant = 20;
+function donSel(val, el){
+  _donMontant = val;
+  document.querySelectorAll('#don-grid > div').forEach(d=>{ d.style.border='2px solid #e2e8f0'; d.style.background='#fff'; });
+  if(el){ el.style.border='2px solid #e67e22'; el.style.background='#fff8f0'; }
+  document.getElementById('don-autre').value = '';
+  document.getElementById('don-lbl').textContent = val+'€';
+}
+function donAutre(inp){
+  const v = parseFloat(inp.value);
+  if(v>0){
+    _donMontant = v;
+    document.querySelectorAll('#don-grid > div').forEach(d=>{ d.style.border='2px solid #e2e8f0'; d.style.background='#fff'; });
+    document.getElementById('don-lbl').textContent = v+'€';
+  }
+}
+async function submitDon(){
+  const nom    = document.getElementById('don-nom')?.value.trim();
+  const prenom = document.getElementById('don-prenom')?.value.trim();
+  const email  = document.getElementById('don-email')?.value.trim();
+  if(!nom||!prenom||!email){ alert('Veuillez remplir nom, prénom et email.'); return; }
+  if(!/\S+@\S+\.\S+/.test(email)){ alert('Email invalide.'); return; }
+  const btn = document.getElementById('btnDonSubmit');
+  btn.disabled=true; btn.textContent='⏳ Enregistrement…';
+  const{error}=await _sbPub.from('dons').insert([{nom,prenom,email,montant:_donMontant,statut:'en_attente'}]);
+  btn.disabled=false;
+  btn.innerHTML='💛 Enregistrer mon don de <span id="don-lbl">'+_donMontant+'€</span>';
+  if(error){ alert('Erreur : '+error.message); return; }
+  try{ await emailjs.send(EMAILJS_SERVICE,TEMPLATE_ADMIN,{name:nom+' '+prenom,email,message:'Nouveau don de '+_donMontant+'€.',time:new Date().toLocaleString('fr-FR')}); }catch(e){console.warn(e);}
+  alert('✅ Don de '+_donMontant+'€ enregistré ! Merci '+prenom+' 🙏\n\nEffectuez maintenant votre paiement via Wero, PayPal ou virement IBAN.\nL\'équipe AKF vous confirmera la réception.');
+  ['don-nom','don-prenom','don-email','don-autre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('donModalOv').classList.remove('open');
+}
+</script>
+
 <!-- ══ JS DASHBOARD ══ -->
 <script>
 
@@ -1280,10 +2355,10 @@ function _mToSB(m){
   };
 }
 // ── Maps FK taches ──────────────────────────────────────────────
-const COMMISSION_MAP={'Présidence':1,'Secrétariat':2,'Trésorerie':3,'Commissaires aux Comptes':4,'Commission Sociale et Educative':5,'Relations extérieures':6,'Organisation':7,'Sages':8,'Communication':9};
+const COMMISSION_MAP={'Présidence':1,'Secrétariat':2,'Trésorerie':3,'Commissaires aux comptes':4,'Commission Sociale et Educative':5,'Relations extérieurs':6,'Organisation':7,'Sages':8};
 const STATUT_T_MAP={'À faire':1,'En cours':2,'Terminée':3,'Annulée':4,'Annulé':4,'Abandonner':4};
 const PRIORITE_MAP={'Basse':1,'Moyenne':2,'Haute':3,'haute':3};
-const COMMISSION_ID={1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux Comptes',5:'Commission Sociale et Educative',6:'Relations extérieures',7:'Organisation',8:'Sages',9:'Communication'};
+const COMMISSION_ID={1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux comptes',5:'Commission Sociale et Educative',6:'Relations extérieurs',7:'Organisation',8:'Sages'};
 const STATUT_T_ID={1:'À faire',2:'En cours',3:'Terminée',4:'Annulée'};
 const PRIORITE_ID={1:'Basse',2:'Moyenne',3:'Haute'};
 
@@ -1579,7 +2654,7 @@ function sbRowToTache(r){
     _id:          r.id,
     id:           r.id,
     activite:     r.activite||'',
-    commission:   {1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux Comptes',5:'Commission Sociale et Educative',6:'Relations extérieures',7:'Organisation',8:'Sages',9:'Communication'}[r.commission_id]||'Secrétariat',
+    commission:   {1:'Présidence',2:'Secrétariat',3:'Trésorerie',4:'Commissaires aux comptes',5:'Commission Sociale et Educative',6:'Relations extérieurs',7:'Organisation',8:'Sages'}[r.commission_id]||'Secrétariat',
     responsable:  r.responsable||'',
     date_debut:   r.date_debut||null,
     date_fin:     r.date_fin||null,
@@ -2419,11 +3494,4 @@ async function initDashboard(){
   document.querySelectorAll('#cr-content p, #cr-content li, #cr-content h1, #cr-content h2, #cr-content h3, #cr-content td').forEach(el => {
     el.setAttribute('contenteditable','true');
   });
-  document.querySelectorAll('.cr-section').forEach(crMakeDraggable);
-  document.querySelectorAll('#cr-content h3').forEach(h=>{h.classList.add('cr-draggable');h.setAttribute('draggable','true');crMakeDraggable(h);});
-}
-
-</script>
-
-</body>
-</html>
+  document.quer
