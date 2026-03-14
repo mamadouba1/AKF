@@ -1446,16 +1446,34 @@ if('serviceWorker' in navigator){
         url_paiement_pdf: e2 ? null : `${folder}/paiement.pdf`
       }).eq('matricule', matricule);
 
-      btn.textContent = 'Carte generee !';
+      btn.textContent = 'Téléchargement des PDFs...';
       btn.style.background = '#00853F';
 
-      // 6. Ouvrir Wero après l'upload
+      // 6. Téléchargement local de la carte PDF
+      function downloadB64PDF(b64, filename) {
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + b64;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Télécharger carte membre en PDF
+      downloadB64PDF(pdfCarteB64, 'carte_membre_AKF_' + matricule + '.pdf');
+
+      // Télécharger les modalités de paiement en PDF (légère pause pour éviter blocage navigateur)
+      setTimeout(() => {
+        downloadB64PDF(pdfPaieB64, 'modalites_paiement_AKF_' + matricule + '.pdf');
+      }, 600);
+
+      // 7. Ouvrir Wero après les téléchargements
       setTimeout(() => {
         window.open(
           'https://start.wero-wallet.eu/?wero-uc=share&wero-url=https%3A%2F%2Fshare.weropay.eu%2Fp%2F1%2Fc%2FY6hk4cGXwY',
           '_blank'
         );
-      }, 800);
+      }, 1400);
 
       setTimeout(()=>{
         btn.disabled = false;
@@ -1467,13 +1485,15 @@ if('serviceWorker' in navigator){
       const msg  = document.createElement('div');
       msg.style.cssText = 'background:#e8f5ee;border:1.5px solid #00853F;border-radius:12px;padding:18px;margin-top:14px;text-align:center';
       msg.innerHTML =
-        '<p style="margin:0;font-weight:800;color:#00853F;font-size:1rem">Carte generee avec succes !</p>' +
+        '<p style="margin:0;font-weight:800;color:#00853F;font-size:1rem">✅ Carte générée avec succès !</p>' +
         '<p style="margin:8px 0 0;color:#065f46;font-size:.85rem;line-height:1.8">' +
-        'Matricule : <strong style="color:#00204A;font-size:.95rem">' + matricule + '</strong><br>' +
-        '<strong>PDFs sauvegardes dans Supabase :</strong><br>' +
-        '&bull; ' + (e1 ? '⚠️ carte.pdf (erreur upload)' : '✅ carte.pdf') + '<br>' +
-        '&bull; ' + (e2 ? '⚠️ paiement.pdf (erreur upload)' : '✅ paiement.pdf') + '<br><br>' +
-        '🔗 Lien Wero ouvert pour le paiement.' +
+        'Matricule : <strong style="color:#00204A;font-size:.95rem">' + matricule + '</strong><br><br>' +
+        '📥 <strong>Téléchargements démarrés :</strong><br>' +
+        '&bull; carte_membre_AKF_' + matricule + '.pdf<br>' +
+        '&bull; modalites_paiement_AKF_' + matricule + '.pdf<br><br>' +
+        (e1 ? '' : '☁️ Carte sauvegardée dans Supabase<br>') +
+        (e2 ? '' : '☁️ Paiement sauvegardé dans Supabase<br>') +
+        '<br>🔗 Lien Wero ouvert pour le paiement.' +
         '</p>';
       body.appendChild(msg);
       setTimeout(()=>msg.remove(), 30000);
