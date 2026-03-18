@@ -48,14 +48,14 @@
   <!-- CDN Supabase + EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <!-- Client Supabase global — utilisé par toute la page -->
+  <!-- ══ CLIENT SUPABASE UNIQUE — partagé par toute la page ══ -->
   <script>
-    const _AKF_SB_URL  = 'https://pbhqvmtepipmldfncths.supabase.co';
-    const _AKF_SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHF2bXRlcGlwbWxkZm5jdGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0MjU3OTAsImV4cCI6MjA4MjAwMTc5MH0.M-0qndrCgH2r3TQDW4I_THvrEYe_nZx51kGKjiF4egg';
-    // Créé une seule fois, partagé entre la page publique ET le dashboard
     var _sbGlobal = null;
     function getSB(){
-      if(!_sbGlobal) _sbGlobal = supabase.createClient(_AKF_SB_URL, _AKF_SB_KEY);
+      if(!_sbGlobal) _sbGlobal = supabase.createClient(
+        'https://pbhqvmtepipmldfncths.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHF2bXRlcGlwbWxkZm5jdGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0MjU3OTAsImV4cCI6MjA4MjAwMTc5MH0.M-0qndrCgH2r3TQDW4I_THvrEYe_nZx51kGKjiF4egg'
+      );
       return _sbGlobal;
     }
   </script>
@@ -221,13 +221,15 @@
     .modal-pub h3{margin:0 0 8px;font-family:"Montserrat";color:var(--akf-bleu)}
     .modal-pub .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
     .footer-pub{margin:26px 0 40px;text-align:center;color:var(--mut);font-size:.9rem}
-    .akf-filtre-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+    /* Filtres actions */
+    .akf-filtre-btn{padding:7px 16px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
     .akf-filtre-btn:hover{border-color:#00204A;color:#00204A}
     .akf-filtre-btn.active{background:#00204A;color:#fff;border-color:#00204A}
+    /* Cartes actions */
     .action-card{background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.07);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
     .action-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.13)}
     .action-card-media{width:100%;height:200px;object-fit:cover;display:block;background:#f1f5f9}
-    .action-card-media-placeholder{width:100%;height:200px;background:linear-gradient(135deg,#00204A,#1E40AF);display:flex;align-items:center;justify-content:center;font-size:3rem}
+    .action-card-media-placeholder{width:100%;height:180px;background:linear-gradient(135deg,#00204A,#1E40AF);display:flex;align-items:center;justify-content:center;font-size:3rem}
     .action-card-body{padding:16px}
     .action-card-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.7rem;font-weight:800;margin-bottom:8px}
     .action-card-badge.action{background:#dbeafe;color:#1E40AF}
@@ -236,9 +238,7 @@
     .action-card-titre{font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1rem;margin:0 0 8px;line-height:1.3}
     .action-card-desc{color:#64748b;font-size:.85rem;line-height:1.6;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
     .action-card-date{font-size:.75rem;color:#94a3b8;font-weight:600}
-    .action-video{width:100%;border-radius:8px;margin-bottom:10px}
-    /* Don modal */
-    .don-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
+    /* Don modal */position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
     .don-modal-ov.open{display:flex}
     .don-modal-box{background:#fff;border-radius:20px;width:min(520px,96vw);max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.28)}
     .don-modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;background:linear-gradient(135deg,#b45309,#e67e22);border-radius:20px 20px 0 0}
@@ -381,7 +381,6 @@ nav{padding:0 8px}
   .fr.full{grid-column:auto}
 
   /* CR */
-  #cr-content{padding:14px 16px!important}
 
   /* Toast au-dessus de la barre */
   .tw-wrap{bottom:68px;right:10px;left:10px}
@@ -472,15 +471,9 @@ tbody td{padding:9px 12px;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 .ldtxt{color:rgba(255,255,255,.8);font-size:.85rem;font-weight:500}
 
-/* ── CR intégré ── */
-.cr-section{margin-bottom:24px}
-.cr-draggable{cursor:move}
-.cr-dragging{opacity:.7;outline:1px dashed #9aa3af}
-.cr-drop{height:0;border-top:2px solid #00853F;margin:4px 0}
-#cr-content [contenteditable]:focus{outline:1px dashed rgba(0,133,63,.4);border-radius:3px}
+/* ── print ── */
 @media print{
-  .sb,.topbar,.ta,.pag,.tcard,.tw-wrap,.ldov,.tools,#cr-wrapper > div:first-child{display:none!important}
-  #cr-content{padding:0!important}
+  .sb,.topbar,.ta,.pag,.tcard,.tw-wrap,.ldov,.tools{display:none!important}
 }
 
   </style>
@@ -1038,71 +1031,43 @@ if('serviceWorker' in navigator){
         <button class="don-modal-close" onclick="document.getElementById('cotisationModalOv').classList.remove('open')">✕</button>
       </div>
       <div style="padding:20px">
-
-        <!-- Message associatif -->
         <div style="background:#e8f5ee;border-left:4px solid #00853F;border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:18px">
           <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00853F;font-size:.85rem;margin:0 0 6px">🤝 L'AKF, une association de solidarité</p>
-          <p style="color:#0f172a;font-size:.85rem;line-height:1.6;margin:0">
-            L'Association des Kébémerois de France vit grâce à l'engagement de ses membres. La cotisation mensuelle de <strong>5€</strong> permet de financer nos actions solidaires, nos événements culturels et nos projets de développement en faveur de Kébémer et de sa diaspora en France.
-          </p>
-          <p style="color:#64748b;font-size:.78rem;margin:8px 0 0;font-style:italic">Votre contribution, même modeste, fait une vraie différence pour notre communauté. 🇸🇳</p>
+          <p style="color:#0f172a;font-size:.85rem;line-height:1.6;margin:0">L'Association des Kébémerois de France vit grâce à l'engagement de ses membres. La cotisation mensuelle de <strong>5€</strong> permet de financer nos actions solidaires, nos événements culturels et nos projets de développement en faveur de Kébémer et de sa diaspora en France.</p>
+          <p style="color:#64748b;font-size:.78rem;margin:8px 0 0;font-style:italic">Votre contribution, même modeste, fait une vraie différence. 🇸🇳</p>
         </div>
-
-        <!-- Formulaire récapitulatif -->
-        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px">Votre récapitulatif de cotisation</p>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div>
-            <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Prénom</label>
-            <input id="cot_prenom" placeholder="Ibrahima" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
-          <div>
-            <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Nom</label>
-            <input id="cot_nom" placeholder="SYLL" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
-          </div>
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px">Votre récapitulatif</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Prénom</label><input id="cot_prenom" placeholder="Ibrahima" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
+          <div><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Nom</label><input id="cot_nom" placeholder="SYLL" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
         </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Email</label>
-          <input id="cot_email" type="email" placeholder="exemple@email.com" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
-        </div>
-
-        <!-- Récap montant -->
+        <div style="margin-bottom:12px"><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Email</label><input id="cot_email" type="email" placeholder="exemple@email.com" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
         <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:12px;padding:14px;margin:14px 0;display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.88rem">Cotisation mensuelle</div>
-            <div style="font-size:.75rem;color:#64748b;margin-top:2px">Association des Kébémerois de France</div>
-          </div>
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.88rem">Cotisation mensuelle</div><div style="font-size:.75rem;color:#64748b;margin-top:2px">Association des Kébémerois de France</div></div>
           <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1.4rem">5 €</div>
         </div>
-
-        <!-- Modalités de paiement -->
         <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Envoyer votre cotisation via</p>
-
         <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
           <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.85rem">Wero</div><div style="font-size:.75rem;color:#64748b">Issa GUEYE</div></div>
           <div style="font-weight:800;color:#00204A;font-size:.85rem">+33 6 67 16 21 87</div>
         </div>
         <div style="background:#fdf4dd;border:1.5px solid #b07d0a;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
           <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#b07d0a;font-size:.85rem">PayPal</div><div style="font-size:.75rem;color:#64748b;font-style:italic">Envoyer en tant qu'ami</div></div>
-          <div style="font-weight:700;font-size:.82rem;color:#0f172a"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e48391819d818d979785a48389858d88ca878b89">[email&#160;protected]</a></div>
+          <div style="font-weight:700;font-size:.82rem;color:#0f172a">gueyeissa@gmail.com</div>
         </div>
-        <div style="background:#e8f5ee;border:1.5px solid #00853F;border-radius:10px;padding:11px 14px;margin-bottom:14px">
+        <div style="background:#e8f5ee;border:1.5px solid #00853F;border-radius:10px;padding:11px 14px;margin-bottom:16px">
           <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00853F;font-size:.85rem;margin-bottom:4px">Revolut — Virement IBAN</div>
           <div style="font-family:'Courier New',monospace;font-weight:700;font-size:.8rem;color:#00204A">FR76 2823 3000 0159 7419 9529 132</div>
           <div style="font-size:.68rem;color:#64748b;font-style:italic;margin-top:2px">Indiquer votre nom en référence</div>
         </div>
-
-        <!-- Bouton générer récap PDF -->
-        <button onclick="genCotisationPDF()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00204A,#1E40AF);color:#fff;border:none;border-radius:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-          📄 Télécharger mon récapitulatif de cotisation
-        </button>
-        <p style="font-size:.7rem;color:#94a3b8;text-align:center;margin:8px 0 0;line-height:1.5">Effectuez le paiement via l'une des méthodes ci-dessus. Merci pour votre soutien !</p>
+        <button onclick="genCotisationPDF()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00204A,#1E40AF);color:#fff;border:none;border-radius:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📄 Télécharger mon récapitulatif</button>
+        <p style="font-size:.7rem;color:#94a3b8;text-align:center;margin:8px 0 0">Merci pour votre soutien à l'AKF !</p>
       </div>
     </div>
   </div>
 
   <!-- ══ SECTION NOS ACTIONS & RÉALISATIONS ══ -->
-  <section id="section-actions" style="max-width:1100px;margin:32px auto;padding:0 16px;display:none">
+  <section id="section-actions" style="max-width:1100px;margin:32px auto;padding:0 16px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
       <div>
         <h2 style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1.5rem;margin:0 0 4px">🌟 Nos Actions &amp; Réalisations</h2>
@@ -1115,14 +1080,14 @@ if('serviceWorker' in navigator){
         <button onclick="filterActions('evenement')" class="akf-filtre-btn" data-filtre="evenement">📅 Événements</button>
       </div>
     </div>
-    <!-- Grille des actions -->
+    <!-- Grille — vide par défaut, remplie par JS si contenu Supabase -->
     <div id="actions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px"></div>
   </section>
 
   <!-- ══ MODAL DÉTAIL ACTION ══ -->
   <div class="don-modal-ov" id="actionDetailOv" onclick="if(event.target===this)this.classList.remove('open')">
     <div class="don-modal-box" style="max-width:680px;max-height:90vh">
-      <div class="don-modal-header" style="background:linear-gradient(135deg,#00204A,#00853F)" id="actionDetailHeader">
+      <div class="don-modal-header" style="background:linear-gradient(135deg,#00204A,#00853F)">
         <h3 id="actionDetailTitre">Titre</h3>
         <button class="don-modal-close" onclick="document.getElementById('actionDetailOv').classList.remove('open')">✕</button>
       </div>
@@ -1133,7 +1098,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 
-  <!-- ══ MODAL PDF VIEWER -->
+  <!-- MODAL PDF VIEWER -->
   <div class="pdf-modal-ov" id="pdf-modal-ov" onclick="closePDFModal(event)">
     <div class="pdf-modal-box">
       <div class="pdf-modal-header">
@@ -1144,7 +1109,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function openPDF(e){
     e.preventDefault();
     const pdfUrl = 'https://raw.githubusercontent.com/mamadouba1/akf/main/Pr%C3%A9sentation_AKF.pdf';
@@ -1164,6 +1129,126 @@ if('serviceWorker' in navigator){
       document.getElementById('pdf-frame').src = '';
     }
   });
+
+  // ══ NOUVELLES FONCTIONS : COTISATION + ACTIONS ══
+
+  function openCotisationModal(e){ if(e) e.preventDefault(); document.getElementById('cotisationModalOv').classList.add('open'); }
+  function scrollToActions(e){ if(e) e.preventDefault(); document.getElementById('section-actions').scrollIntoView({behavior:'smooth'}); document.getElementById('mobileMenu').classList.remove('open'); }
+
+  // ── PDF Cotisation ──
+  function genCotisationPDF(){
+    const prenom = document.getElementById('cot_prenom').value.trim()||'Prénom';
+    const nom    = document.getElementById('cot_nom').value.trim()||'Nom';
+    const email  = document.getElementById('cot_email').value.trim()||'';
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const W = 210;
+    pdf.setFillColor(0,133,63);   pdf.rect(0,0,W/3,7,'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3,0,W/3,7,'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,0,W/3,7,'F');
+    pdf.setFillColor(0,32,74); pdf.rect(0,7,W,38,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(22); pdf.setTextColor(255,255,255); pdf.text('AKF',16,26);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230); pdf.text('Association des Kebemerois de France',16,33);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(255,255,255); pdf.text('RECAPITULATIF DE COTISATION',W/2,24,{align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230); pdf.text('Cotisation mensuelle — 5 euros / mois',W/2,33,{align:'center'});
+    pdf.setFillColor(232,245,238); pdf.setDrawColor(0,133,63); pdf.setLineWidth(0.5); pdf.rect(14,55,W-28,32,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(0,100,50); pdf.text('Adherent(e)',W/2,66,{align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(15,23,42);
+    pdf.text('Nom : '+prenom+' '+nom,W/2,75,{align:'center'});
+    if(email) pdf.text('Email : '+email,W/2,83,{align:'center'});
+    pdf.setFontSize(10); pdf.setTextColor(30,30,30);
+    pdf.text("L'AKF est une association de solidarite et d'entraide. Votre cotisation",W/2,102,{align:'center'});
+    pdf.text("mensuelle de 5 euros finance nos actions et projets pour Kebemer.",W/2,110,{align:'center'});
+    pdf.setFillColor(0,32,74); pdf.rect(14,122,W-28,22,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255); pdf.text('MONTANT DE LA COTISATION MENSUELLE',W/2,132,{align:'center'});
+    pdf.setFontSize(18); pdf.setTextColor(253,239,66); pdf.text('5 euros / mois',W/2,144,{align:'center'});
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(0,32,74); pdf.text('Modalites de paiement',W/2,162,{align:'center'});
+    pdf.setDrawColor(180,195,220); pdf.setLineWidth(0.4); pdf.line(14,166,W-14,166);
+    pdf.setFillColor(240,247,255); pdf.setDrawColor(30,64,175); pdf.rect(14,170,W-28,20,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(30,64,175); pdf.text('Wero',22,180);
+    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42); pdf.text('Issa GUEYE',22,187); pdf.setFont('helvetica','bold'); pdf.text('+33 6 67 16 21 87',W-22,187,{align:'right'});
+    pdf.setFillColor(255,250,235); pdf.setDrawColor(176,125,10); pdf.rect(14,194,W-28,20,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(140,95,5); pdf.text('PayPal',22,204);
+    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42); pdf.text('gueyeissa@gmail.com',W-22,204,{align:'right'});
+    pdf.setFillColor(240,252,246); pdf.setDrawColor(0,133,63); pdf.rect(14,218,W-28,26,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(0,100,50); pdf.text('Revolut - Virement IBAN',22,228);
+    pdf.setFont('courier','bold'); pdf.setFontSize(9); pdf.setTextColor(15,23,42); pdf.text('FR76 2823 3000 0159 7419 9529 132',40,237);
+    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(100,100,100); pdf.text('Indiquer votre nom en reference du virement',22,243);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(30,30,30); pdf.text("Merci de votre engagement — assokebefrance@gmail.com",W/2,262,{align:'center'});
+    pdf.setFillColor(0,133,63);   pdf.rect(0,277,W/3,7,'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3,277,W/3,7,'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,277,W/3,7,'F');
+    pdf.save('AKF_cotisation_'+prenom+'_'+nom+'.pdf');
+  }
+
+  // ── Actions & Réalisations ──
+  let _allActions = [];
+
+  async function loadActions(){
+    const section = document.getElementById('section-actions');
+    const grid    = document.getElementById('actions-grid');
+    try {
+      const { data, error } = await getSB().from('actions_realisations')
+        .select('*').eq('publie', true).order('date_publication',{ascending:false});
+      if(error || !data || data.length === 0){
+        grid.innerHTML = ''; // grille vide, la section reste visible avec juste la barre filtres
+        return;
+      }
+      _allActions = data;
+      renderActions(_allActions);
+    } catch(e){ grid.innerHTML = ''; }
+  }
+
+  function renderActions(items){
+    const grid = document.getElementById('actions-grid');
+    if(!items || items.length === 0){ grid.innerHTML = ''; return; }
+    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
+    grid.innerHTML = items.map(a => {
+      const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+      const cat  = a.categorie || 'action';
+      const media = a.image_url
+        ? `<img class="action-card-media" src="${a.image_url}" alt="${a.titre}" onerror="this.style.display='none'">`
+        : `<div class="action-card-media-placeholder">${a.video_url?'🎬':'🌟'}</div>`;
+      return `<div class="action-card" onclick='openActionDetail(${JSON.stringify(a)})'>
+        ${media}
+        <div class="action-card-body">
+          <span class="action-card-badge ${cat}">${labels[cat]||cat}</span>
+          <h3 class="action-card-titre">${a.titre||''}</h3>
+          <p class="action-card-desc">${a.description||''}</p>
+          ${date?`<div class="action-card-date">📅 ${date}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterActions(filtre){
+    document.querySelectorAll('.akf-filtre-btn').forEach(b => b.classList.toggle('active', b.dataset.filtre===filtre));
+    renderActions(filtre==='tous' ? _allActions : _allActions.filter(a=>a.categorie===filtre));
+  }
+
+  function openActionDetail(a){
+    document.getElementById('actionDetailTitre').textContent = a.titre||'';
+    let mediaHTML = '';
+    if(a.image_url){
+      mediaHTML = `<img src="${a.image_url}" alt="${a.titre}" style="width:100%;max-height:320px;object-fit:cover;display:block">`;
+    } else if(a.video_url){
+      const yt = a.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?\/]+)/);
+      mediaHTML = yt
+        ? `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen style="display:block"></iframe>`
+        : `<video style="width:100%;border-radius:8px" controls src="${a.video_url}"></video>`;
+    }
+    document.getElementById('actionDetailMedia').innerHTML = mediaHTML;
+    const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
+    const cat = a.categorie||'action';
+    document.getElementById('actionDetailCorps').innerHTML = `
+      <span class="action-card-badge ${cat}" style="margin-bottom:12px;display:inline-flex">${labels[cat]||cat}</span>
+      ${date?`<p style="color:#94a3b8;font-size:.8rem;font-weight:600;margin:0 0 14px">📅 ${date}</p>`:''}
+      <div style="color:#0f172a;font-size:.93rem;line-height:1.75;white-space:pre-wrap">${a.description||''}</div>
+      ${a.lien_externe?`<a href="${a.lien_externe}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 16px;background:#00204A;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem">🔗 En savoir plus</a>`:''}
+    `;
+    document.getElementById('actionDetailOv').classList.add('open');
+  }
 
   // ══ CARTE MEMBRE JS ══
 
@@ -1229,192 +1314,6 @@ if('serviceWorker' in navigator){
     if(e) e.preventDefault();
     document.getElementById('reseauxModalOv').classList.add('open');
   }
-  function openCotisationModal(e){
-    if(e) e.preventDefault();
-    document.getElementById('cotisationModalOv').classList.add('open');
-  }
-  function scrollToActions(e){
-    if(e) e.preventDefault();
-    document.getElementById('section-actions').scrollIntoView({behavior:'smooth'});
-    document.getElementById('mobileMenu').classList.remove('open');
-  }
-
-  // ══ COTISATION PDF ══
-  function genCotisationPDF(){
-    const prenom = document.getElementById('cot_prenom').value.trim() || 'Prénom';
-    const nom    = document.getElementById('cot_nom').value.trim()    || 'Nom';
-    const email  = document.getElementById('cot_email').value.trim()  || '';
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const W = 210;
-    // Bandeau tricolore
-    pdf.setFillColor(0,133,63);   pdf.rect(0,0,W/3,7,'F');
-    pdf.setFillColor(253,239,66); pdf.rect(W/3,0,W/3,7,'F');
-    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,0,W/3,7,'F');
-    // Header
-    pdf.setFillColor(0,32,74); pdf.rect(0,7,W,38,'F');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(22); pdf.setTextColor(255,255,255);
-    pdf.text('AKF',16,26);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230);
-    pdf.text('Association des Kebemerois de France',16,33);
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(255,255,255);
-    pdf.text('RECAPITULATIF DE COTISATION',W/2,24,{align:'center'});
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230);
-    pdf.text('Cotisation mensuelle — 5 euros / mois',W/2,33,{align:'center'});
-    // Bloc adherent
-    pdf.setFillColor(232,245,238); pdf.setDrawColor(0,133,63); pdf.setLineWidth(0.5);
-    pdf.rect(14,55,W-28,32,'FD');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(0,100,50);
-    pdf.text('Adherent(e)',W/2,66,{align:'center'});
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(15,23,42);
-    pdf.text('Nom : '+prenom+' '+nom,W/2,75,{align:'center'});
-    if(email) pdf.text('Email : '+email,W/2,83,{align:'center'});
-    // Message solidarite
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(30,30,30);
-    pdf.text("L'AKF est une association de solidarite et d'entraide. Votre cotisation",W/2,102,{align:'center'});
-    pdf.text("mensuelle de 5 euros finance nos actions, nos evenements culturels et",W/2,110,{align:'center'});
-    pdf.text("nos projets de developpement pour Kebemer et sa diaspora.",W/2,118,{align:'center'});
-    // Montant
-    pdf.setFillColor(0,32,74); pdf.rect(14,128,W-28,22,'F');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255);
-    pdf.text('MONTANT DE LA COTISATION MENSUELLE',W/2,138,{align:'center'});
-    pdf.setFontSize(18); pdf.setTextColor(253,239,66);
-    pdf.text('5 euros / mois',W/2,150,{align:'center'});
-    // Modalites paiement
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(0,32,74);
-    pdf.text('Modalites de paiement',W/2,168,{align:'center'});
-    pdf.setDrawColor(180,195,220); pdf.setLineWidth(0.4); pdf.line(14,172,W-14,172);
-    // Wero
-    pdf.setFillColor(240,247,255); pdf.setDrawColor(30,64,175); pdf.setLineWidth(0.4);
-    pdf.rect(14,176,W-28,20,'FD');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(30,64,175);
-    pdf.text('Wero',22,186);
-    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42);
-    pdf.text('Issa GUEYE',22,193);
-    pdf.setFont('helvetica','bold');
-    pdf.text('+33 6 67 16 21 87',W-22,193,{align:'right'});
-    // PayPal
-    pdf.setFillColor(255,250,235); pdf.setDrawColor(176,125,10);
-    pdf.rect(14,200,W-28,20,'FD');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(140,95,5);
-    pdf.text('PayPal',22,210);
-    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42);
-    pdf.text('gueyeissa@gmail.com',W-22,210,{align:'right'});
-    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(100,100,100);
-    pdf.text('Envoyer en tant que paiement a des amis',22,217);
-    // IBAN
-    pdf.setFillColor(240,252,246); pdf.setDrawColor(0,133,63);
-    pdf.rect(14,224,W-28,26,'FD');
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(0,100,50);
-    pdf.text('Revolut - Virement IBAN',22,234);
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(15,23,42);
-    pdf.text('IBAN :',22,241);
-    pdf.setFont('courier','bold'); pdf.text('FR76 2823 3000 0159 7419 9529 132',40,241);
-    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(100,100,100);
-    pdf.text('Indiquer votre nom en reference du virement',22,247);
-    // Footer
-    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(30,30,30);
-    pdf.text("Merci de votre engagement envers l'AKF !  assokebefrance@gmail.com",W/2,268,{align:'center'});
-    // Bandeau bas
-    pdf.setFillColor(0,133,63);   pdf.rect(0,283,W/3,7,'F');
-    pdf.setFillColor(253,239,66); pdf.rect(W/3,283,W/3,7,'F');
-    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,283,W/3,7,'F');
-    pdf.save('AKF_cotisation_'+prenom+'_'+nom+'.pdf');
-  }
-
-  // ══ NOS ACTIONS & RÉALISATIONS — chargement Supabase ══
-  let _allActions = [];
-
-  async function loadActions(){
-    const section = document.getElementById('section-actions');
-    const grid = document.getElementById('actions-grid');
-    try {
-      const client = getSB();
-      const { data, error } = await client.from('actions_realisations')
-        .select('*').eq('publie', true).order('date_publication', {ascending:false});
-      if(error || !data || data.length === 0){
-        section.style.display = 'none';
-        return;
-      }
-      _allActions = data;
-      renderActions(_allActions);
-      section.style.display = 'block';
-    } catch(e){
-      section.style.display = 'none';
-    }
-  }
-
-  function renderActions(items){
-    const section = document.getElementById('section-actions');
-    const grid = document.getElementById('actions-grid');
-    if(!items || items.length === 0){
-      section.style.display = 'none';
-      return;
-    }
-    section.style.display = 'block';
-    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
-    grid.innerHTML = items.map(a => {
-      const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
-      let mediaHTML = '';
-      if(a.image_url){
-        mediaHTML = `<img class="action-card-media" src="${a.image_url}" alt="${a.titre}" onerror="this.style.display='none'">`;
-      } else if(a.video_url){
-        mediaHTML = `<div class="action-card-media-placeholder">🎬</div>`;
-      } else {
-        mediaHTML = `<div class="action-card-media-placeholder">🌟</div>`;
-      }
-      const cat = a.categorie || 'action';
-      return `<div class="action-card" onclick='openActionDetail(${JSON.stringify(a)})'>
-        ${mediaHTML}
-        <div class="action-card-body">
-          <span class="action-card-badge ${cat}">${labels[cat]||cat}</span>
-          <h3 class="action-card-titre">${a.titre||''}</h3>
-          <p class="action-card-desc">${a.description||''}</p>
-          ${date ? `<div class="action-card-date">📅 ${date}</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function filterActions(filtre){
-    document.querySelectorAll('.akf-filtre-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.filtre === filtre);
-    });
-    const filtered = filtre === 'tous' ? _allActions : _allActions.filter(a => a.categorie === filtre);
-    renderActions(filtered);
-  }
-
-  function openActionDetail(a){
-    document.getElementById('actionDetailTitre').textContent = a.titre || '';
-    // Media
-    let mediaHTML = '';
-    if(a.image_url){
-      mediaHTML = `<img src="${a.image_url}" alt="${a.titre}" style="width:100%;max-height:320px;object-fit:cover;display:block">`;
-    } else if(a.video_url){
-      // Support YouTube embed
-      const ytMatch = a.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?\/]+)/);
-      if(ytMatch){
-        mediaHTML = `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="display:block"></iframe>`;
-      } else {
-        mediaHTML = `<video class="action-video" controls src="${a.video_url}"></video>`;
-      }
-    }
-    document.getElementById('actionDetailMedia').innerHTML = mediaHTML;
-    // Corps
-    const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
-    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
-    const cat = a.categorie || 'action';
-    document.getElementById('actionDetailCorps').innerHTML = `
-      <span class="action-card-badge ${cat}" style="margin-bottom:12px;display:inline-flex">${labels[cat]||cat}</span>
-      ${date ? `<p style="color:#94a3b8;font-size:.8rem;font-weight:600;margin:0 0 14px">📅 ${date}</p>` : ''}
-      <div style="color:#0f172a;font-size:.93rem;line-height:1.75;white-space:pre-wrap">${a.description||''}</div>
-      ${a.lien_externe ? `<a href="${a.lien_externe}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 16px;background:#00204A;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem">🔗 En savoir plus</a>` : ''}
-    `;
-    document.getElementById('actionDetailOv').classList.add('open');
-  }
-
-  // loadActions sera appelé après l'init de _sbPub (voir bas du script public)
-
   function openCarteMembre(e){
     e.preventDefault();
     // Reset étape 1
@@ -1948,7 +1847,6 @@ if('serviceWorker' in navigator){
     <div class="ni" id="ni-liste" onclick="goTab('liste',this)"><span class="ni-ic">📋</span><span class="ni-txt">Liste</span><span class="ni-b" id="nb-l">0</span></div>
     <div class="ni" id="ni-carte" onclick="goTab('carte',this)"><span class="ni-ic">🗺️</span><span class="ni-txt">Carte</span></div>
     <div class="ni" id="ni-taches" onclick="goTab('taches',this)"><span class="ni-ic">✅</span><span class="ni-txt">Tâches</span><span class="ni-b" id="nb-t">0</span></div>
-    <div class="ni" id="ni-cr" onclick="goTab('cr',this)"><span class="ni-ic">📄</span><span class="ni-txt">CR</span></div>
   </nav>
   <div class="sfoot" id="sfoot">Données locales</div>
 </div>
@@ -2143,137 +2041,6 @@ if('serviceWorker' in navigator){
     </table></div>
     <div class="pag" id="pgt"></div>
   </div>
-</div>
-
-<!-- ══ TAB COMPTE RENDU (intégré sans iframe) ══ -->
-<div class="tc" id="tab-cr">
-  <div class="topbar">
-    <div class="tt"><h1>Compte Rendu de Réunion</h1><p>Éditeur · AKF 2026</p></div>
-    <div class="ta">
-      <button class="btn bgh" onclick="printCR()">📄 PDF</button>
-      <button class="btn bg" id="btn-save-cr" onclick="saveCR()">💾 Sauvegarder</button>
-    </div>
-  </div>
-  <div id="cr-wrapper" style="background:#fff;border-radius:13px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);overflow:hidden">
-    <!-- Barre outils CR -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--ln);background:var(--bg)">
-      <button class="btn bgh" style="font-size:.74rem;padding:5px 10px" onclick="crAddSection()">➕ Titre</button>
-      <button class="btn bgh" style="font-size:.74rem;padding:5px 10px" onclick="crAddSubtitle()">➕ Sous-titre</button>
-      <button class="btn bgh" style="font-size:.74rem;padding:5px 10px" onclick="crAddPoint()">➕ Point</button>
-      <button class="btn bgh" style="font-size:.74rem;padding:5px 10px" onclick="crAddAction()">➕ Action</button>
-      <button class="btn br" style="font-size:.74rem;padding:5px 10px" onclick="crDelete()">🗑️ Supprimer</button>
-      <button class="btn br" style="font-size:.74rem;padding:5px 10px;margin-left:auto" onclick="crReset()" title="Remet le CR à son état par défaut et efface la version Supabase">🔄 Réinitialiser</button>
-    </div>
-    <!-- Contenu CR éditable -->
-    <div id="cr-content" style="padding:24px 32px;font-family:'Aptos','Helvetica Neue',Arial,sans-serif;color:#333;line-height:1.6">
-
-      <div style="display:flex;flex-direction:column;align-items:center;border-bottom:2px solid #FDEF42;padding-bottom:12px;margin-bottom:20px">
-        <img src="https://i.postimg.cc/MG6xqtLp/8f8dd0a7_ae8f_4fbc_8820_8ada8583a6f8.jpg" alt="Logo AKF" style="max-width:90px;height:auto;margin-bottom:6px">
-        <h1 id="cr-titre" contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;margin:4px 0;text-align:center;font-size:1.2rem">COMPTE RENDU DE RÉUNION (N°10)</h1>
-        <p contenteditable="true" style="margin:0;color:#00853F;font-weight:600;font-family:'Montserrat',sans-serif;font-size:.88rem;text-align:center">ASSOCIATION DES KEBEMEROIS DE FRANCE (A.K.F)</p>
-      </div>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">1. INFORMATIONS GÉNÉRALES</h2>
-        <ul>
-          <li contenteditable="true"><strong>Date :</strong> Dimanche 1er Mars 2026</li>
-          <li contenteditable="true"><strong>Horaire :</strong> 13h00 à 14h30</li>
-          <li contenteditable="true"><strong>Format :</strong> Visioconférence WhatsApp</li>
-        </ul>
-      </section>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">2. ETAT DES PRESENCES</h2>
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">Étaient présents :</h3>
-        <p contenteditable="true">M. BA, I. SYLL, M. DIOP, S. NIANG, M.K. MBENGUE, A.B. KHOUMA, E.H.C. FAYE, A. DIENG, M.A. FALL, F. KEBE, I. DIOP, M. DIOP, S.D. GUISSE, M. KEBE, F. GUEYE, M.S. KEBE, S. NDIAYE, M.T. DIENG, I. GUEYE, M. THIAM.</p>
-      </section>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">3. ORDRE DU JOUR</h2>
-        <ul>
-          <li contenteditable="true">Organisation des outils de travail (Drive et Tableau de bord)</li>
-          <li contenteditable="true">Fonctionnement interne et feuilles de route des commissions</li>
-          <li contenteditable="true">Présentation des lignes directrices et plans d'actions 2026</li>
-          <li contenteditable="true">Présentation du planning de déploiement</li>
-        </ul>
-      </section>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">4. DÉROULEMENT DE LA SÉANCE</h2>
-        <p contenteditable="true">Le Président ouvre la séance et rappelle l'importance du respect du temps de parole et de la structuration des travaux des commissions.</p>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.1 Secrétariat général</h3>
-        <p contenteditable="true">Le Secrétariat a présenté l'architecture du Drive collaboratif et du Tableau de Bord (TDB). Il s'établit comme le pivot administratif de l'A.K.F, garantissant la traçabilité des décisions et la circulation de l'information.</p>
-        <ul>
-          <li contenteditable="true"><strong>Organisation :</strong> structuration en deux niveaux avec un pilotage stratégique (SG/SGA) et des pôles opérationnels (Fichier membres, PV, Archives).</li>
-          <li contenteditable="true"><strong>Feuille de route 2026 :</strong> priorité à la mise en conformité juridique (Statuts, RI), à la planification des instances (AG annuelle, réunions mensuelles du Bureau) et à la gestion rigoureuse des adhésions via un fichier centralisé.</li>
-          <li contenteditable="true"><strong>Mémoire numérique :</strong> mise en place d'une arborescence Drive structurée pour l'archivage systématique de tout document finalisé.</li>
-          <li contenteditable="true"><strong>Point de vigilance :</strong> améliorer la structuration des comptes rendus pour une meilleure traçabilité.</li>
-        </ul>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.2 Trésorier et commissariat aux comptes</h3>
-        <p contenteditable="true">Écrire ici…</p>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.3 Relations extérieures</h3>
-        <ul>
-          <li contenteditable="true">Rôle stratégique dans la légitimité et le financement de l'A.K.F.</li>
-          <li contenteditable="true">Ciblage prioritaire des mairies françaises, du Consulat du Sénégal et des Dahiras.</li>
-          <li contenteditable="true">Développement du mécénat et préparation de dossiers de sponsoring.</li>
-          <li contenteditable="true">Utilisation de reportages terrain («&nbsp;preuves par l'image&nbsp;») pour renforcer la crédibilité auprès des donateurs.</li>
-        </ul>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.4 Communication</h3>
-        <ul>
-          <li contenteditable="true">Pôle structuré en quatre unités : Responsable - Community Manager - Création - Presse.</li>
-          <li contenteditable="true">Feuille de route : identité visuelle (T1), crédibilité (T2), connexion avec Kébémer (T3), rayonnement (T4).</li>
-          <li contenteditable="true">Rappel : la communication est stratégique pour le développement de l'Association et est au service des autres commissions.</li>
-        </ul>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.5 Commission sociale et éducative</h3>
-        <ul>
-          <li contenteditable="true"><strong>Pôle Éducatif :</strong> Campagnes de collecte pour les écoles prioritaires de Kébémer.</li>
-          <li contenteditable="true">Mise en place de classes virtuelles animées par la diaspora.</li>
-          <li contenteditable="true">Programme «&nbsp;1 étudiant = 1 mentor&nbsp;» pour l'insertion professionnelle en France.</li>
-          <li contenteditable="true"><strong>Pôle Social :</strong> Création d'un fonds social pour les situations d'urgence (décès, maladie, rapatriement).</li>
-          <li contenteditable="true">Permanences d'information et parrainage pour les nouveaux arrivants.</li>
-          <li contenteditable="true">Envoi de matériel médical et de denrées aux centres de santé et familles vulnérables de Kébémer.</li>
-        </ul>
-
-        <h3 contenteditable="true" class="cr-draggable" draggable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF">4.6 Écrire ici…</h3>
-        <p contenteditable="true">Écrire ici…</p>
-      </section>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">5. DÉCISIONS PRISES</h2>
-        <ul>
-          <li contenteditable="true">Démarrage immédiat des activités.</li>
-          <li contenteditable="true">Reconnaissance administrative.</li>
-          <li contenteditable="true">Communication externe.</li>
-        </ul>
-      </section>
-
-      <section class="cr-section cr-draggable" draggable="true">
-        <h2 contenteditable="true" style="font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0">6. ACTIONS À MENER</h2>
-        <table id="cr-actionsTable" style="width:100%;border-collapse:collapse;margin-top:12px">
-          <thead><tr>
-            <th style="background:#1E40AF;color:#fff;padding:10px;border:1px solid #ddd;font-family:'Montserrat',sans-serif">Responsable</th>
-            <th style="background:#1E40AF;color:#fff;padding:10px;border:1px solid #ddd;font-family:'Montserrat',sans-serif">Action</th>
-          </tr></thead>
-          <tbody>
-            <tr><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Secrétariat</td><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Démarches officielles</td></tr>
-            <tr style="background:#f2f2f2"><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Communication</td><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Pages officielles / stratégie</td></tr>
-            <tr><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Trésorerie</td><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Relance cotisations</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <div style="display:flex;justify-content:space-between;margin-top:40px;padding-top:16px;border-top:1px solid #ccc">
-        <div contenteditable="true"><h3 style="font-family:'Montserrat',sans-serif;color:#1E40AF">Le Président</h3><p>DIOP Mor</p></div>
-        <div contenteditable="true"><h3 style="font-family:'Montserrat',sans-serif;color:#1E40AF">Le Secrétaire Général</h3><p>SYLL Ibrahima</p></div>
-      </div>
-
-    </div><!-- /cr-content -->
-  </div><!-- /cr-wrapper -->
 </div>
 
 </main>
@@ -2724,119 +2491,6 @@ async function sbDT(id,_id){
   if(error)console.warn('SB delete tâche:',error.message);
   return!error;
 }
-
-// ─── CRUD CR ─────────────────────────────────────────────────────
-function printCR(){
-  const w=window.open('','_blank');
-  const c=g('cr-content').innerHTML;
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CR AKF</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
-  <style>body{font-family:'Aptos','Helvetica Neue',Arial,sans-serif;color:#333;padding:20px;max-width:900px;margin:0 auto}
-  h1,h2,h3{font-family:'Montserrat',sans-serif;color:#1E40AF}
-  table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px}
-  th{background:#1E40AF;color:#fff}.cr-section{margin-bottom:24px}</style><link rel="canonical" href="https://akf-six.vercel.app/" />
-</head><body>${c}</body></html>`);
-  w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
-}
-
-async function saveCR(){
-  const btn=g('btn-save-cr');
-  const rc=g('cr-content'); if(!rc){toast('⚠️ Contenu introuvable','#c0392b');return;}
-  const titre=(g('cr-titre')?.textContent||'Compte Rendu').trim();
-  btn.disabled=true; btn.textContent='⏳ Sauvegarde…';
-  const{error}=await _sb.from('comptes_rendus').upsert(
-    [{titre, contenu_html:rc.innerHTML, updated_at:new Date().toISOString()}],
-    {onConflict:'titre'}
-  );
-  btn.disabled=false; btn.textContent='💾 Sauvegarder';
-  if(error){toast('❌ '+error.message,'#c0392b');return;}
-  toast('✅ Compte rendu sauvegardé !','#0e7a45');
-}
-
-async function crReset(){
-  if(!confirm('⚠️ Réinitialiser le CR ?\n\nCela va effacer la version sauvegardée dans Supabase et remettre le modèle par défaut. Cette action est irréversible.')) return;
-  const btn=g('btn-save-cr');
-  btn.disabled=true; btn.textContent='⏳ Réinitialisation…';
-  // Supprimer toutes les entrées CR dans Supabase
-  try {
-    await _sb.from('comptes_rendus').delete().neq('id', 0);
-  } catch(e){ console.warn('Reset CR Supabase:', e); }
-  // Recharger la page pour retrouver le HTML statique par défaut
-  btn.disabled=false; btn.textContent='💾 Sauvegarder';
-  toast('✅ CR réinitialisé — rechargement…', '#0e7a45');
-  setTimeout(() => location.reload(), 1500);
-}
-
-// ─── JS éditeur CR ───────────────────────────────────────────────
-function crSel(){const s=window.getSelection();if(!s||!s.rangeCount)return null;const n=s.anchorNode;return n.nodeType===3?n.parentNode:n;}
-function crClosest(el,sel){while(el&&el.nodeType===1){if(el.matches&&el.matches(sel))return el;el=el.parentNode;}return null;}
-function crSection(){let n=crSel(),c=n;while(c&&c.id!=='cr-content'&&!c.classList?.contains('cr-section'))c=c.parentNode;return c&&c.id!=='cr-content'?c:null;}
-function crH2style(){return "font-family:'Montserrat',sans-serif;color:#1E40AF;border-left:5px solid #00853F;padding-left:12px;margin-top:0";}
-function crH3style(){return "font-family:'Montserrat',sans-serif;color:#1E40AF";}
-
-function crAddSection(){
-  const s=document.createElement('section');
-  s.className='cr-section cr-draggable'; s.setAttribute('draggable','true');
-  s.innerHTML=`<h2 contenteditable="true" style="${crH2style()}">Nouveau titre</h2><p contenteditable="true">Écrire ici…</p>`;
-  const b=crSection(),root=g('cr-content');
-  if(b)b.insertAdjacentElement('afterend',s); else root.appendChild(s);
-  crMakeDraggable(s);
-}
-function crAddSubtitle(){
-  const h3=document.createElement('h3');
-  h3.contentEditable='true'; h3.textContent='Nouveau sous-titre';
-  h3.setAttribute('style',crH3style()); h3.classList.add('cr-draggable'); h3.setAttribute('draggable','true');
-  const b=crSection()||[...document.querySelectorAll('.cr-section')].pop();
-  b.appendChild(h3); crMakeDraggable(h3);
-  const p=document.createElement('p'); p.contentEditable='true'; p.textContent='Écrire ici…';
-  b.appendChild(p);
-}
-function crAddPoint(){
-  const n=crSel(); if(!n){toast('⚠️ Clique dans une liste','#c0392b');return;}
-  const li=crClosest(n,'li'), list=crClosest(n,'ul,ol');
-  const nl=document.createElement('li'); nl.contentEditable='true'; nl.textContent='Nouveau point';
-  if(li){li.insertAdjacentElement('afterend',nl);}
-  else if(list){list.appendChild(nl);}
-  else{toast('⚠️ Clique dans une liste','#c0392b');return;}
-}
-function crAddAction(){
-  const tbody=document.querySelector('#cr-actionsTable tbody');
-  const tr=document.createElement('tr');
-  const isEven=tbody.rows.length%2===1;
-  tr.style.background=isEven?'#f2f2f2':'';
-  tr.innerHTML=`<td contenteditable="true" style="padding:10px;border:1px solid #ddd">Responsable</td><td contenteditable="true" style="padding:10px;border:1px solid #ddd">Action</td>`;
-  tbody.appendChild(tr);
-}
-function crDelete(){
-  const n=crSel(); if(!n){toast('⚠️ Place le curseur','#c0392b');return;}
-  const checks=[
-    {e:crClosest(n,'h2'),msg:'Supprimer la section ?',fn:el=>el.closest('.cr-section').remove()},
-    {e:crClosest(n,'h3'),msg:'Supprimer le sous-titre ?',fn:el=>el.remove()},
-    {e:crClosest(n,'li'),msg:'Supprimer ce point ?',fn:el=>el.remove()},
-    {e:crClosest(n,'tr'),msg:'Supprimer cette action ?',fn:el=>el.remove()},
-    {e:crClosest(n,'p'), msg:'Supprimer ce paragraphe ?',fn:el=>el.remove()},
-  ];
-  const t=checks.find(x=>x.e);
-  if(!t){toast('⚠️ Rien à supprimer ici','#b07d0a');return;}
-  if(confirm(t.msg))t.fn(t.e);
-}
-
-// Drag & drop CR
-let _crDrag=null,_crDrop=null;
-function crMakeDraggable(el){
-  el.addEventListener('dragstart',e=>{_crDrag=el;el.classList.add('cr-dragging');e.dataTransfer.effectAllowed='move';if(!_crDrop){_crDrop=document.createElement('div');_crDrop.className='cr-drop';}g('cr-content').appendChild(_crDrop);});
-  el.addEventListener('dragend',()=>{el.classList.remove('cr-dragging');_crDrop?.remove();_crDrop=null;_crDrag=null;});
-}
-g('cr-content')?.addEventListener('dragover',e=>{
-  if(!_crDrag)return; e.preventDefault();
-  const els=[...g('cr-content').querySelectorAll('.cr-section,.cr-draggable h3')];
-  let near=null,off=-999999;
-  els.forEach(i=>{if(i===_crDrag)return;const r=i.getBoundingClientRect(),d=e.clientY-(r.top+r.height/2);if(d<0&&d>off){off=d;near=i;}});
-  if(near)near.insertAdjacentElement('beforebegin',_crDrop); else g('cr-content').appendChild(_crDrop);
-});
-g('cr-content')?.addEventListener('drop',e=>{if(_crDrag&&_crDrop)_crDrop.insertAdjacentElement('beforebegin',_crDrag);});
-
-// ═══════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
 // DONNÉES (initialisées vides — chargées depuis Supabase)
@@ -3748,36 +3402,18 @@ async function initDashboard(){
     else console.warn('Supabase tâches init:', error?.message);
   } catch(e){ console.warn('Init tâches error:', e); }
 
-  // Charger CR depuis Supabase
-  try {
-    const {data, error} = await _sb.from('comptes_rendus').select('*').order('updated_at', {ascending:false}).limit(1);
-    if(!error && data && data.length){
-      const cr = data[0];
-      if(cr.contenu_html && g('cr-content')){
-        g('cr-content').innerHTML = cr.contenu_html;
-        // Rendre TOUS les éléments textuels éditables après rechargement depuis Supabase
-        g('cr-content').querySelectorAll('p, li, h1, h2, h3, td').forEach(el => {
-          el.setAttribute('contenteditable','true');
-        });
-        g('cr-content').querySelectorAll('.cr-section').forEach(crMakeDraggable);
-        g('cr-content').querySelectorAll('h3').forEach(h=>{h.classList.add('cr-draggable');h.setAttribute('draggable','true');crMakeDraggable(h);});
-      }
-    }
-  } catch(e){ console.warn('Init CR error:', e); }
-
   g('ldov').classList.add('hide');
   g('sfoot').textContent = (okM||okT)
     ? 'Supabase · '+new Date().toLocaleTimeString('fr-FR')
     : '⚠️ Hors ligne · '+new Date().toLocaleDateString('fr-FR');
 
   refreshAll();
-  // Leaflet : init APRÈS que le div #map soit visible
   setTimeout(()=>{ initMap(); }, 50);
 
   if(okM||okT) toast(`✅ ${M.length} membres · ${T.length} tâches chargés depuis Supabase`, '#0e7a45');
   else toast('⚠️ Connexion Supabase échouée', '#c0392b');
+}
 
-  document.querySelectorAll('#cr-content p, #cr-content li, #cr-content h1, #cr-content h2, #cr-content h3, #cr-content td').forEach(el => {
-    el.setAttribute('contenteditable','true');
-  });
-  document.query
+</script>
+</body>
+</html>
