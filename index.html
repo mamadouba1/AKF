@@ -210,6 +210,22 @@
     .modal-pub h3{margin:0 0 8px;font-family:"Montserrat";color:var(--akf-bleu)}
     .modal-pub .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
     .footer-pub{margin:26px 0 40px;text-align:center;color:var(--mut);font-size:.9rem}
+    .akf-filtre-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+    .akf-filtre-btn:hover{border-color:#00204A;color:#00204A}
+    .akf-filtre-btn.active{background:#00204A;color:#fff;border-color:#00204A}
+    .action-card{background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.07);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+    .action-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.13)}
+    .action-card-media{width:100%;height:200px;object-fit:cover;display:block;background:#f1f5f9}
+    .action-card-media-placeholder{width:100%;height:200px;background:linear-gradient(135deg,#00204A,#1E40AF);display:flex;align-items:center;justify-content:center;font-size:3rem}
+    .action-card-body{padding:16px}
+    .action-card-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.7rem;font-weight:800;margin-bottom:8px}
+    .action-card-badge.action{background:#dbeafe;color:#1E40AF}
+    .action-card-badge.realisation{background:#e8f5ee;color:#00853F}
+    .action-card-badge.evenement{background:#fef3c7;color:#b07d0a}
+    .action-card-titre{font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1rem;margin:0 0 8px;line-height:1.3}
+    .action-card-desc{color:#64748b;font-size:.85rem;line-height:1.6;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .action-card-date{font-size:.75rem;color:#94a3b8;font-weight:600}
+    .action-video{width:100%;border-radius:8px;margin-bottom:10px}
     /* Don modal */
     .don-modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px}
     .don-modal-ov.open{display:flex}
@@ -513,6 +529,8 @@ if('serviceWorker' in navigator){
         <a class="akf-nav-link" href="#" onclick="openPDF(event)">📖 Découvrir l'AKF</a>
         <a class="akf-nav-link" href="#" onclick="openDonModal(event)">💛 Faire un Don</a>
         <a class="akf-nav-link" href="#" onclick="openCarteMembre(event)">🪪 Carte Membre</a>
+        <a class="akf-nav-link" href="#" onclick="openCotisationModal(event)">💳 Cotisation</a>
+        <a class="akf-nav-link" href="#" onclick="scrollToActions(event)">🌟 Nos Actions</a>
         <a class="akf-nav-link" href="#" onclick="openReseauxModal(event)">📱 Réseaux sociaux</a>
       </div>
       <div class="akf-nav-right">
@@ -531,6 +549,8 @@ if('serviceWorker' in navigator){
     <a class="akf-mobile-link" href="#" onclick="openPDF(event);document.getElementById('mobileMenu').classList.remove('open')">📖 Découvrir l'AKF</a>
     <a class="akf-mobile-link" href="#" onclick="openDonModal(event);document.getElementById('mobileMenu').classList.remove('open')">💛 Faire un Don</a>
     <a class="akf-mobile-link" href="#" onclick="openCarteMembre(event);document.getElementById('mobileMenu').classList.remove('open')">🪪 Carte Membre</a>
+    <a class="akf-mobile-link" href="#" onclick="openCotisationModal(event);document.getElementById('mobileMenu').classList.remove('open')">💳 Cotisation</a>
+    <a class="akf-mobile-link" href="#" onclick="scrollToActions(event);document.getElementById('mobileMenu').classList.remove('open')">🌟 Nos Actions</a>
     <a class="akf-mobile-link" href="#" onclick="openReseauxModal(event);document.getElementById('mobileMenu').classList.remove('open')">📱 Réseaux sociaux</a>
     <button class="akf-mobile-link" onclick="document.getElementById('adminOv').classList.add('open');document.getElementById('mobileMenu').classList.remove('open')">🔒 Tableau de bord</button>
     <button class="akf-mobile-link" onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open')">🧭 Rejoindre l'AKF</button>
@@ -547,6 +567,7 @@ if('serviceWorker' in navigator){
         <button onclick="document.getElementById('details-inscription').open=true;document.getElementById('details-inscription').scrollIntoView({behavior:'smooth'})" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:var(--akf-vert);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:filter .18s;box-shadow:0 4px 14px rgba(0,133,63,.35)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">🧭 Rejoindre l'AKF</button>
         <button onclick="document.getElementById('donModalOv').classList.add('open')" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:#e67e22;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:filter .18s;box-shadow:0 4px 14px rgba(230,126,34,.35)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">💛 Faire un Don</button>
         <button onclick="openCarteMembre(event)" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;backdrop-filter:blur(6px);transition:background .18s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">🪪 Carte Membre</button>
+        <button onclick="openCotisationModal(event)" style="display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;backdrop-filter:blur(6px);transition:background .18s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">💳 Cotisation</button>
       </div>
     </div>
   </div>
@@ -998,7 +1019,110 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 
-  <!-- MODAL PDF VIEWER -->
+  <!-- ══ MODAL COTISATION ══ -->
+  <div class="don-modal-ov" id="cotisationModalOv">
+    <div class="don-modal-box" style="max-width:560px">
+      <div class="don-modal-header" style="background:linear-gradient(135deg,#00204A,#1E40AF)">
+        <h3>💳 Cotisation AKF — 5€ / mois</h3>
+        <button class="don-modal-close" onclick="document.getElementById('cotisationModalOv').classList.remove('open')">✕</button>
+      </div>
+      <div style="padding:20px">
+
+        <!-- Message associatif -->
+        <div style="background:#e8f5ee;border-left:4px solid #00853F;border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:18px">
+          <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00853F;font-size:.85rem;margin:0 0 6px">🤝 L'AKF, une association de solidarité</p>
+          <p style="color:#0f172a;font-size:.85rem;line-height:1.6;margin:0">
+            L'Association des Kébémerois de France vit grâce à l'engagement de ses membres. La cotisation mensuelle de <strong>5€</strong> permet de financer nos actions solidaires, nos événements culturels et nos projets de développement en faveur de Kébémer et de sa diaspora en France.
+          </p>
+          <p style="color:#64748b;font-size:.78rem;margin:8px 0 0;font-style:italic">Votre contribution, même modeste, fait une vraie différence pour notre communauté. 🇸🇳</p>
+        </div>
+
+        <!-- Formulaire récapitulatif -->
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px">Votre récapitulatif de cotisation</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div>
+            <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Prénom</label>
+            <input id="cot_prenom" placeholder="Ibrahima" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+          <div>
+            <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Nom</label>
+            <input id="cot_nom" placeholder="SYLL" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Email</label>
+          <input id="cot_email" type="email" placeholder="exemple@email.com" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none;transition:border .15s" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+
+        <!-- Récap montant -->
+        <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:12px;padding:14px;margin:14px 0;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.88rem">Cotisation mensuelle</div>
+            <div style="font-size:.75rem;color:#64748b;margin-top:2px">Association des Kébémerois de France</div>
+          </div>
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1.4rem">5 €</div>
+        </div>
+
+        <!-- Modalités de paiement -->
+        <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Envoyer votre cotisation via</p>
+
+        <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.85rem">Wero</div><div style="font-size:.75rem;color:#64748b">Issa GUEYE</div></div>
+          <div style="font-weight:800;color:#00204A;font-size:.85rem">+33 6 67 16 21 87</div>
+        </div>
+        <div style="background:#fdf4dd;border:1.5px solid #b07d0a;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#b07d0a;font-size:.85rem">PayPal</div><div style="font-size:.75rem;color:#64748b;font-style:italic">Envoyer en tant qu'ami</div></div>
+          <div style="font-weight:700;font-size:.82rem;color:#0f172a"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e48391819d818d979785a48389858d88ca878b89">[email&#160;protected]</a></div>
+        </div>
+        <div style="background:#e8f5ee;border:1.5px solid #00853F;border-radius:10px;padding:11px 14px;margin-bottom:14px">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00853F;font-size:.85rem;margin-bottom:4px">Revolut — Virement IBAN</div>
+          <div style="font-family:'Courier New',monospace;font-weight:700;font-size:.8rem;color:#00204A">FR76 2823 3000 0159 7419 9529 132</div>
+          <div style="font-size:.68rem;color:#64748b;font-style:italic;margin-top:2px">Indiquer votre nom en référence</div>
+        </div>
+
+        <!-- Bouton générer récap PDF -->
+        <button onclick="genCotisationPDF()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00204A,#1E40AF);color:#fff;border:none;border-radius:11px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          📄 Télécharger mon récapitulatif de cotisation
+        </button>
+        <p style="font-size:.7rem;color:#94a3b8;text-align:center;margin:8px 0 0;line-height:1.5">Effectuez le paiement via l'une des méthodes ci-dessus. Merci pour votre soutien !</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION NOS ACTIONS & RÉALISATIONS ══ -->
+  <section id="section-actions" style="max-width:1100px;margin:32px auto;padding:0 16px;display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:1.5rem;margin:0 0 4px">🌟 Nos Actions &amp; Réalisations</h2>
+        <p style="color:#64748b;font-size:.88rem;margin:0">Les projets et initiatives portés par l'AKF pour notre communauté</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="actions-filtres">
+        <button onclick="filterActions('tous')" class="akf-filtre-btn active" data-filtre="tous">Tout voir</button>
+        <button onclick="filterActions('action')" class="akf-filtre-btn" data-filtre="action">🚀 Actions en cours</button>
+        <button onclick="filterActions('realisation')" class="akf-filtre-btn" data-filtre="realisation">✅ Réalisations</button>
+        <button onclick="filterActions('evenement')" class="akf-filtre-btn" data-filtre="evenement">📅 Événements</button>
+      </div>
+    </div>
+    <!-- Grille des actions -->
+    <div id="actions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px"></div>
+  </section>
+
+  <!-- ══ MODAL DÉTAIL ACTION ══ -->
+  <div class="don-modal-ov" id="actionDetailOv" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="don-modal-box" style="max-width:680px;max-height:90vh">
+      <div class="don-modal-header" style="background:linear-gradient(135deg,#00204A,#00853F)" id="actionDetailHeader">
+        <h3 id="actionDetailTitre">Titre</h3>
+        <button class="don-modal-close" onclick="document.getElementById('actionDetailOv').classList.remove('open')">✕</button>
+      </div>
+      <div style="overflow-y:auto;max-height:calc(90vh - 60px)">
+        <div id="actionDetailMedia" style="width:100%;max-height:320px;overflow:hidden;background:#f1f5f9"></div>
+        <div style="padding:20px" id="actionDetailCorps"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL PDF VIEWER -->
   <div class="pdf-modal-ov" id="pdf-modal-ov" onclick="closePDFModal(event)">
     <div class="pdf-modal-box">
       <div class="pdf-modal-header">
@@ -1009,7 +1133,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function openPDF(e){
     e.preventDefault();
     const pdfUrl = 'https://raw.githubusercontent.com/mamadouba1/akf/main/Pr%C3%A9sentation_AKF.pdf';
@@ -1094,6 +1218,192 @@ if('serviceWorker' in navigator){
     if(e) e.preventDefault();
     document.getElementById('reseauxModalOv').classList.add('open');
   }
+  function openCotisationModal(e){
+    if(e) e.preventDefault();
+    document.getElementById('cotisationModalOv').classList.add('open');
+  }
+  function scrollToActions(e){
+    if(e) e.preventDefault();
+    document.getElementById('section-actions').scrollIntoView({behavior:'smooth'});
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
+  // ══ COTISATION PDF ══
+  function genCotisationPDF(){
+    const prenom = document.getElementById('cot_prenom').value.trim() || 'Prénom';
+    const nom    = document.getElementById('cot_nom').value.trim()    || 'Nom';
+    const email  = document.getElementById('cot_email').value.trim()  || '';
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const W = 210;
+    // Bandeau tricolore
+    pdf.setFillColor(0,133,63);   pdf.rect(0,0,W/3,7,'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3,0,W/3,7,'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,0,W/3,7,'F');
+    // Header
+    pdf.setFillColor(0,32,74); pdf.rect(0,7,W,38,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(22); pdf.setTextColor(255,255,255);
+    pdf.text('AKF',16,26);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230);
+    pdf.text('Association des Kebemerois de France',16,33);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.setTextColor(255,255,255);
+    pdf.text('RECAPITULATIF DE COTISATION',W/2,24,{align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(160,190,230);
+    pdf.text('Cotisation mensuelle — 5 euros / mois',W/2,33,{align:'center'});
+    // Bloc adherent
+    pdf.setFillColor(232,245,238); pdf.setDrawColor(0,133,63); pdf.setLineWidth(0.5);
+    pdf.rect(14,55,W-28,32,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(11); pdf.setTextColor(0,100,50);
+    pdf.text('Adherent(e)',W/2,66,{align:'center'});
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(15,23,42);
+    pdf.text('Nom : '+prenom+' '+nom,W/2,75,{align:'center'});
+    if(email) pdf.text('Email : '+email,W/2,83,{align:'center'});
+    // Message solidarite
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(30,30,30);
+    pdf.text("L'AKF est une association de solidarite et d'entraide. Votre cotisation",W/2,102,{align:'center'});
+    pdf.text("mensuelle de 5 euros finance nos actions, nos evenements culturels et",W/2,110,{align:'center'});
+    pdf.text("nos projets de developpement pour Kebemer et sa diaspora.",W/2,118,{align:'center'});
+    // Montant
+    pdf.setFillColor(0,32,74); pdf.rect(14,128,W-28,22,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.setTextColor(255,255,255);
+    pdf.text('MONTANT DE LA COTISATION MENSUELLE',W/2,138,{align:'center'});
+    pdf.setFontSize(18); pdf.setTextColor(253,239,66);
+    pdf.text('5 euros / mois',W/2,150,{align:'center'});
+    // Modalites paiement
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(0,32,74);
+    pdf.text('Modalites de paiement',W/2,168,{align:'center'});
+    pdf.setDrawColor(180,195,220); pdf.setLineWidth(0.4); pdf.line(14,172,W-14,172);
+    // Wero
+    pdf.setFillColor(240,247,255); pdf.setDrawColor(30,64,175); pdf.setLineWidth(0.4);
+    pdf.rect(14,176,W-28,20,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(30,64,175);
+    pdf.text('Wero',22,186);
+    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42);
+    pdf.text('Issa GUEYE',22,193);
+    pdf.setFont('helvetica','bold');
+    pdf.text('+33 6 67 16 21 87',W-22,193,{align:'right'});
+    // PayPal
+    pdf.setFillColor(255,250,235); pdf.setDrawColor(176,125,10);
+    pdf.rect(14,200,W-28,20,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(140,95,5);
+    pdf.text('PayPal',22,210);
+    pdf.setFont('helvetica','normal'); pdf.setTextColor(15,23,42);
+    pdf.text('gueyeissa@gmail.com',W-22,210,{align:'right'});
+    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(100,100,100);
+    pdf.text('Envoyer en tant que paiement a des amis',22,217);
+    // IBAN
+    pdf.setFillColor(240,252,246); pdf.setDrawColor(0,133,63);
+    pdf.rect(14,224,W-28,26,'FD');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor(0,100,50);
+    pdf.text('Revolut - Virement IBAN',22,234);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(15,23,42);
+    pdf.text('IBAN :',22,241);
+    pdf.setFont('courier','bold'); pdf.text('FR76 2823 3000 0159 7419 9529 132',40,241);
+    pdf.setFont('helvetica','italic'); pdf.setFontSize(8); pdf.setTextColor(100,100,100);
+    pdf.text('Indiquer votre nom en reference du virement',22,247);
+    // Footer
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(30,30,30);
+    pdf.text("Merci de votre engagement envers l'AKF !  assokebefrance@gmail.com",W/2,268,{align:'center'});
+    // Bandeau bas
+    pdf.setFillColor(0,133,63);   pdf.rect(0,283,W/3,7,'F');
+    pdf.setFillColor(253,239,66); pdf.rect(W/3,283,W/3,7,'F');
+    pdf.setFillColor(227,27,35);  pdf.rect(2*W/3,283,W/3,7,'F');
+    pdf.save('AKF_cotisation_'+prenom+'_'+nom+'.pdf');
+  }
+
+  // ══ NOS ACTIONS & RÉALISATIONS — chargement Supabase ══
+  let _allActions = [];
+
+  async function loadActions(){
+    const section = document.getElementById('section-actions');
+    const grid = document.getElementById('actions-grid');
+    try {
+      const { data, error } = await _sb.from('actions_realisations')
+        .select('*').eq('publie', true).order('date_publication', {ascending:false});
+      if(error || !data || data.length === 0){
+        section.style.display = 'none'; // rien à afficher, on cache tout
+        return;
+      }
+      _allActions = data;
+      renderActions(_allActions);
+      section.style.display = 'block'; // afficher la section seulement si contenu
+    } catch(e){
+      section.style.display = 'none'; // en cas d'erreur, on cache aussi
+    }
+  }
+
+  function renderActions(items){
+    const section = document.getElementById('section-actions');
+    const grid = document.getElementById('actions-grid');
+    if(!items || items.length === 0){
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
+    grid.innerHTML = items.map(a => {
+      const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+      let mediaHTML = '';
+      if(a.image_url){
+        mediaHTML = `<img class="action-card-media" src="${a.image_url}" alt="${a.titre}" onerror="this.style.display='none'">`;
+      } else if(a.video_url){
+        mediaHTML = `<div class="action-card-media-placeholder">🎬</div>`;
+      } else {
+        mediaHTML = `<div class="action-card-media-placeholder">🌟</div>`;
+      }
+      const cat = a.categorie || 'action';
+      return `<div class="action-card" onclick='openActionDetail(${JSON.stringify(a)})'>
+        ${mediaHTML}
+        <div class="action-card-body">
+          <span class="action-card-badge ${cat}">${labels[cat]||cat}</span>
+          <h3 class="action-card-titre">${a.titre||''}</h3>
+          <p class="action-card-desc">${a.description||''}</p>
+          ${date ? `<div class="action-card-date">📅 ${date}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterActions(filtre){
+    document.querySelectorAll('.akf-filtre-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.filtre === filtre);
+    });
+    const filtered = filtre === 'tous' ? _allActions : _allActions.filter(a => a.categorie === filtre);
+    renderActions(filtered);
+  }
+
+  function openActionDetail(a){
+    document.getElementById('actionDetailTitre').textContent = a.titre || '';
+    // Media
+    let mediaHTML = '';
+    if(a.image_url){
+      mediaHTML = `<img src="${a.image_url}" alt="${a.titre}" style="width:100%;max-height:320px;object-fit:cover;display:block">`;
+    } else if(a.video_url){
+      // Support YouTube embed
+      const ytMatch = a.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?\/]+)/);
+      if(ytMatch){
+        mediaHTML = `<iframe width="100%" height="300" src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="display:block"></iframe>`;
+      } else {
+        mediaHTML = `<video class="action-video" controls src="${a.video_url}"></video>`;
+      }
+    }
+    document.getElementById('actionDetailMedia').innerHTML = mediaHTML;
+    // Corps
+    const date = a.date_publication ? new Date(a.date_publication).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+    const labels = {action:'🚀 Action en cours', realisation:'✅ Réalisation', evenement:'📅 Événement'};
+    const cat = a.categorie || 'action';
+    document.getElementById('actionDetailCorps').innerHTML = `
+      <span class="action-card-badge ${cat}" style="margin-bottom:12px;display:inline-flex">${labels[cat]||cat}</span>
+      ${date ? `<p style="color:#94a3b8;font-size:.8rem;font-weight:600;margin:0 0 14px">📅 ${date}</p>` : ''}
+      <div style="color:#0f172a;font-size:.93rem;line-height:1.75;white-space:pre-wrap">${a.description||''}</div>
+      ${a.lien_externe ? `<a href="${a.lien_externe}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:10px 16px;background:#00204A;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem">🔗 En savoir plus</a>` : ''}
+    `;
+    document.getElementById('actionDetailOv').classList.add('open');
+  }
+
+  // Charger les actions au démarrage
+  window.addEventListener('load', ()=>{ if(typeof _sb !== 'undefined') loadActions(); });
+
   function openCarteMembre(e){
     e.preventDefault();
     // Reset étape 1
@@ -3463,10 +3773,4 @@ async function initDashboard(){
   document.querySelectorAll('#cr-content p, #cr-content li, #cr-content h1, #cr-content h2, #cr-content h3, #cr-content td').forEach(el => {
     el.setAttribute('contenteditable','true');
   });
-  document.querySelectorAll('.cr-section').forEach(crMakeDraggable);
-  document.querySelectorAll('#cr-content h3').forEach(h=>{h.classList.add('cr-draggable');h.setAttribute('draggable','true');crMakeDraggable(h);});
-}
-
-</script>
-</body>
-</html>
+  document.query
