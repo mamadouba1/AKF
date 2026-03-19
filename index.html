@@ -1039,7 +1039,7 @@ if('serviceWorker' in navigator){
         </div>
         <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px">Votre récapitulatif</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Prénom</label><input id="cot_prenom" placeholder="Ibrahima" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
+          <div><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Prénom</label><input id="cot_prenom" placeholder="Prénom" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
           <div><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Nom</label><input id="cot_nom" placeholder="Nom" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
         </div>
         <div style="margin-bottom:12px"><label style="font-size:.75rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">Email</label><input id="cot_email" type="email" placeholder="exemple@email.com" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none" onfocus="this.style.borderColor='#1E40AF'" onblur="this.style.borderColor='#e2e8f0'"></div>
@@ -1049,7 +1049,7 @@ if('serviceWorker' in navigator){
         </div>
         <p style="font-family:'Montserrat',sans-serif;font-weight:800;color:#00204A;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin:14px 0 8px">Envoyer votre cotisation via</p>
         <div style="background:#eff6ff;border:1.5px solid #1E40AF;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.85rem">Wero</div><div style="font-size:.75rem;color:#64748b">Issa GUEYE</div></div>
+          <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;color:#1E40AF;font-size:.85rem">Wero</div><div style="font-size:.75rem;color:#64748b">Bientôt disponible</div></div>
           <div style="font-weight:800;color:#00204A;font-size:.85rem">+33 0 00 00 00 00</div>
         </div>
         <div style="background:#fdf4dd;border:1.5px solid #b07d0a;border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
@@ -1776,19 +1776,19 @@ if('serviceWorker' in navigator){
         <summary>🧭 Rejoignez‑nous</summary>
         <div class="acc-body">
           <div class="row two">
-            <div><label>Nom *</label><input id="i_nom" placeholder="BA"></div>
-            <div><label>Prénom *</label><input id="i_prenom" placeholder="Mamadou"></div>
+            <div><label>Nom *</label><input id="i_nom" placeholder="Nom"></div>
+            <div><label>Prénom *</label><input id="i_prenom" placeholder="Prénom"></div>
           </div>
           <div class="row two">
             <div><label>Sexe</label><select id="i_sexe"><option>Homme</option><option>Femme</option></select></div>
-            <div><label>Ville *</label><input id="i_ville" placeholder="Compiègne"></div>
+            <div><label>Ville *</label><input id="i_ville" placeholder="Paris"></div>
           </div>
           <div class="row two">
-            <div><label>Téléphone *</label><input id="i_telephone" placeholder="07…"></div>
+            <div><label>Téléphone *</label><input id="i_telephone" placeholder="+33 0 00 00 00 00"></div>
             <div><label>Email *</label><input id="i_email" type="email" placeholder="exemple@email.com"></div>
           </div>
           <div class="row two">
-            <div><label>Année d'arrivée</label><input id="i_annee" type="number" min="1990" max="2035" placeholder="2023"></div>
+            <div><label>Année d'arrivée</label><input id="i_annee" type="number" min="1900" max="2999" placeholder="2023"></div>
             <div><label>Statut *</label><select id="i_statut"><option>Professionnel</option><option>Étudiant</option><option>Autres</option></select></div>
           </div>
           <div class="row two">
