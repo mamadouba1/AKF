@@ -2440,12 +2440,14 @@ function dateSqlT(d){
 }
 function _tToSB(t, forUpdate=false){
   const commissionLabel = t.commission||'Secrétariat';
+  // Normalise les dates : '' ou undefined → null, sinon passe par dateSqlT()
+  function safeDate(d){ const v=dateSqlT(d); return (v===''||v===undefined)?null:v; }
   const payload={
     activite:      t.activite||'',
     responsable:   t.responsable||'',
-    date_debut:    t.date_debut||null,
-    date_fin:      t.date_fin||null,
-    relance:       t.relance||null,
+    date_debut:    safeDate(t.date_debut),
+    date_fin:      safeDate(t.date_fin),
+    relance:       safeDate(t.relance),
     commentaires:  t.commentaires||'',
     commission:    commissionLabel,
     commission_id: COMMISSION_MAP[commissionLabel]||2,
@@ -3285,7 +3287,10 @@ async function addTache(){
   toast(sbId?'✅ Tâche ajoutée dans Supabase !':'⚠️ Tâche ajoutée (hors-ligne, Supabase KO)',sbId?'#0e7a45':'#b07d0a');
   _currentTacheForNotif['at'] = t;
   if(notifSelected['at']?.length) envoyerNotifTache('at', t);
-  ['at-activite','at-responsable','at-date_debut','at-date_fin','at-relance','at-commentaires'].forEach(id=>{g(id).value='';});
+  ['at-activite','at-responsable','at-date_debut','at-date_fin','at-relance','at-commentaires'].forEach(id=>{if(g(id))g(id).value='';});
+  if(g('at-statut'))g('at-statut').value='À faire';
+  if(g('at-priorite'))g('at-priorite').value='Moyenne';
+  if(g('at-commission'))g('at-commission').value='Secrétariat';
 }
 
 function editTache(idx){
